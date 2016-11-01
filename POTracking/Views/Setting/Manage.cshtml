@@ -1,0 +1,73 @@
+﻿@model IEnumerable<POT.DAL.Setting>
+@using HSG.Helper
+@using System.Collections
+@{ ViewBag.Title = "Manage Setting"; Layout = Defaults.masterLayout;}
+@*{bool? oprSuccess = ((bool?)ViewData["oprSuccess"]);}*@
+@section HeadContent {
+<script type="text/javascript">
+    $().ready(function () {
+        $('form').submit(function () { $('#btnSubmit').prop('disabled', true); });
+        //SO: 2823471/jquery-how-to-find-first-visible-input-select-textarea-excluding-buttons
+        $('#tblSettings').find('input[type=text],textarea,select').filter(':visible:first').focus();
+
+        @*if (oprSuccess.HasValue)
+        {
+            @Html.Raw(Defaults.getOprResult(oprSuccess.Value, (ViewData["err"] ?? "Error").ToString()))
+        }*@
+    });
+</script>
+}
+    @using (Html.BeginForm())
+    {@Html.ValidationSummary(true)
+    <table width="100%" border="0" id="tblSettings">
+        <tr>
+            <td colspan="2">
+                <b class="smallHeading">Manage Settings</b>
+            </td>
+        </tr>
+        <tr>
+            <td align="center" class="w100">
+                @Html.ValidationSummary(true)                
+                <span><i><b>Note:</b> Settings will be refreshed after next login</i></span>
+            </td>
+            <td align="right" class="sqz">
+                <input type="submit" id = "btnSubmit" value="Save changes" onclick="document.getElementById('chkDone').checked = true;" />@*HT: http://www.mediacollege.com/internet/javascript/page/reload.html *@
+                &nbsp;<input type="button" onclick="window.location.href=window.location.href" value="Reset" />
+                <input type="checkbox" id="chkDone" name="chkDone" style="display: none" />&nbsp;&nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table class="thinBorder w100">
+                    <thead class="header">
+                        <tr>
+                            <th>
+                                Setting
+                            </th>
+                            <th>
+                                Value
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th nowrap="nowrap">
+                                Last<br /> Modified By
+                            </th>
+                            <th nowrap="nowrap">
+                                Last <br />Modified Date
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null) {
+                            for (int i = 0; i < Model.Count(); i++) {
+                            @*User control will decide what to render as the control's edit value*@
+                            @Html.EditorFor(x => x.ToList<POT.DAL.Setting>()[i], "SettingEdit")
+                            }
+                        } 
+                    </tbody>
+                </table>                  
+            </td>
+        </tr>
+    </table>
+    }

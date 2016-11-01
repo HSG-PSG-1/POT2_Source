@@ -1,0 +1,14 @@
+<email>
+  <subject>AOT PO #: [PO#] was assigned to you</subject>
+  <body>
+    <![CDATA[
+<FONT SIZE="2" COLOR="" FACE="Verdana">
+	AOT PO #: [PO#] was assigned to you by [ASSIGNER]<br/><br/>
+The last comment entered was:<br><br>
+"[COMMENT]"<br/><br/>
+To access this PO, use this link:<br/>
+<a href="[LINK]" title="Go to this PO">[LINK]</a><br/>
+</FONT>
+]]>
+  </body>
+</email>

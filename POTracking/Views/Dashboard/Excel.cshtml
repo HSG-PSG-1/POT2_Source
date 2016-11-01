@@ -1,0 +1,42 @@
+﻿@model IEnumerable<POT.DAL.vw_PO_Dashboard>
+@using System.Collections
+@using HSG.Helper
+@{Layout = ""; /* Master page is NOT needed here */}
+<style type="text/css">
+table {font-size: 12px;font-family: Calibri, Verdana, Helvetica, Sans-Serif;border: solid 1px #BFB88E;border-collapse: collapse;}
+td,th{text-align: center;background-color:#EEECE1;}
+tbody tr td{background-color:#ffffff;}
+</style>
+<table border="1">
+    <thead>
+    <tr>
+        <th>PO #</th>
+        <th>PO Date</th>
+        @if (!_Session.IsAsiaVendor){<th>Vendor</th>}        
+        <th>Shtip To City</th>        
+        <th>ETD</th>
+        <th>ETA</th>        
+        <th>Status</th>        
+        <th>Has Comments</th>
+        <th>Has Files</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model){ 
+    <tr>
+        <td align="center">@item.PONumber</td>
+        <td align="center">@Html.Raw(item.PODate.HasValue?item.PODate.Value.ToString(Defaults.dtFormat, Defaults.ci):"")</td>
+        @if (!_Session.IsAsiaVendor)
+        {
+        <td align="center">@item.VendorName</td>
+        }
+        <td align="center">@item.ShipToCity</td>
+        <td align="center">@Html.Raw(item.Etd.HasValue ? item.Etd.Value.ToString(Defaults.dtFormat, Defaults.ci) : "")</td>
+        <td align="center">@Html.Raw(item.Eta.HasValue ? item.Eta.Value.ToString(Defaults.dtFormat, Defaults.ci) : "")</td>
+        <td align="center">@item.Status</td>
+        <td align="center">@Html.Raw(item.CommentsExist?"Yes":"No")</td>
+        <td align="center">@Html.Raw(item.FilesHExist?"Yes":"No")</td>
+    </tr>
+     }
+    </tbody>
+</table>

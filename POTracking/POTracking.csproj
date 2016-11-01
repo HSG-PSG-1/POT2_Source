@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{60AD91F9-7E2F-433B-B54E-8BF7098C5352}</ProjectGuid>
+    <ProjectTypeGuids>{e53f8fea-eae0-44a6-8774-ffd645390401};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>POT</RootNamespace>
+    <AssemblyName>POT</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MvcBuildViews>true</MvcBuildViews>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Elmah.Mvc, Version=2.1.2.1389, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Elmah.Mvc.2.1.2\lib\net40\Elmah.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MiniProfiler, Version=3.2.0.157, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniProfiler.3.2.0.157\lib\net40\MiniProfiler.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MvcPager, Version=1.4.0.0, Culture=neutral, PublicKeyToken=f6872c5a09aed72c, processorArchitecture=MSIL" />
+    <Reference Include="protobuf-net, Version=2.0.0.431, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc.Extensions, Version=1.0.9.0, Culture=neutral, PublicKeyToken=17e35335fc9f8fc8, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Web.Mvc.Extensions.Mvc.4.1.0.9\lib\net40\System.Web.Mvc.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebActivator">
+      <HintPath>Lib\WebActivator.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Code\Helper\Attribute\JSONAttributes.cs" />
+    <Compile Include="Code\Helper\ConfigSettings.cs" />
+    <Compile Include="Code\Helper\_SessionLookup.cs" />
+    <Compile Include="Code\Helper\_SessionUser.cs" />
+    <Compile Include="Code\Helper\QryString.cs" />
+    <Compile Include="Code\Helper\Library\Crypto.cs" />
+    <Compile Include="Code\Helper\Extension\GroupDropListExtension.cs" />
+    <Compile Include="Code\Helper\Attribute\IsAuthorizeAttribute.cs" />
+    <Compile Include="Code\Helper\Defaults.cs" />
+    <Compile Include="Code\Helper\Library\Dynamic.cs" />
+    <Compile Include="Code\Helper\Extension\ExtensionMethods.cs" />
+    <Compile Include="Code\Helper\Attribute\Attributes.cs" />
+    <Compile Include="Code\Helper\Library\FileIO.cs" />
+    <Compile Include="Code\Helper\Library\CustomMembership.cs" />
+    <Compile Include="Code\Helper\Library\MailManager.cs" />
+    <Compile Include="Code\Helper\Serialization.cs" />
+    <Compile Include="Code\Helper\_Enums.cs" />
+    <Compile Include="Code\Helper\_Session.cs" />
+    <Compile Include="Code\Services\ActivityLogService.cs" />
+    <Compile Include="Code\Services\CommentService.cs" />
+    <Compile Include="Code\Services\DetailService.cs" />
+    <Compile Include="Code\Services\POService.cs" />
+    <Compile Include="Code\Services\StatusHistoryService.cs" />
+    <Compile Include="Code\Services\POFileService.cs" />
+    <Compile Include="Code\Services\SettingService.cs" />
+    <Compile Include="Code\Services\SecurityService.cs" />
+    <Compile Include="Code\Services\DefaultDBService.cs" />
+    <Compile Include="Code\Services\DashboardService.cs" />
+    <Compile Include="Code\Services\LookupService.cs" />
+    <Compile Include="Code\Services\MasterService.cs" />
+    <Compile Include="Code\Services\OrgService.cs" />
+    <Compile Include="Code\Services\_ServiceBase.cs" />
+    <Compile Include="Code\Services\UserService.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\DashboardJQGController.cs" />
+    <Compile Include="Controllers\POController.cs" />
+    <Compile Include="Controllers\POCommentController.cs" />
+    <Compile Include="Controllers\POFileController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\CommonController.cs" />
+    <Compile Include="Controllers\ActivityController.cs" />
+    <Compile Include="Controllers\StatusController.cs" />
+    <Compile Include="Controllers\SettingController.cs" />
+    <Compile Include="Controllers\RoleController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Code\POTracking.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>POTracking.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\MasterController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ActivityHistoryModels.cs" />
+    <Compile Include="Models\POModels.cs" />
+    <Compile Include="Models\PrintModels.cs" />
+    <Compile Include="Models\SettingModels.cs" />
+    <Compile Include="Models\DashboardModels.cs" />
+    <Compile Include="Models\MasterModels.cs" />
+    <Compile Include="Models\UserModels.cs" />
+    <Compile Include="Models\_CommonModels.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\BI_Fileupload\css\jquery.fileupload-ui.css" />
+    <Content Include="Content\BI_Fileupload\css\jquery.fileupload.css" />
+    <Content Include="Content\BI_Fileupload\jquery.fileupload.js" />
+    <Content Include="Content\BI_Fileupload\jquery.iframe-transport.js" />
+    <Content Include="Content\Images\AOT-Header.png" />
+    <Content Include="Content\Images\clip.gif" />
+    <Content Include="Content\Images\del.gif" />
+    <Content Include="Content\Images\edit.gif" />
+    <Content Include="Content\Images\kbd.png" />
+    <Content Include="Content\Images\page\bg.gif" />
+    <Content Include="Content\Images\page\page-first-disabled.gif" />
+    <Content Include="Content\Images\page\page-first.gif" />
+    <Content Include="Content\Images\page\page-last-disabled.gif" />
+    <Content Include="Content\Images\page\page-last.gif" />
+    <Content Include="Content\Images\page\page-next-disabled.gif" />
+    <Content Include="Content\Images\page\page-next.gif" />
+    <Content Include="Content\Images\page\page-prev-disabled.gif" />
+    <Content Include="Content\Images\page\page-prev.gif" />
+    <Content Include="Content\Images\Print.jpg" />
+    <Content Include="Content\Images\Print.png" />
+    <Content Include="Content\Images\refresh.gif" />
+    <Content Include="Content\Images\nav_clear.png" />
+    <Content Include="Content\Images\cancel.png" />
+    <Content Include="Content\Images\reset.png" />
+    <Content Include="Content\Images\search.gif" />
+    <Content Include="Content\Images\tires_banner.gif" />
+    <Content Include="Content\JQG\css\ui.multiselect.css" />
+    <Content Include="Content\JQG\ui.multiselect.js" />
+    <Content Include="Content\JQG\jqg.columnSelecter.js" />
+    <Content Include="Content\JQG\css\ui.jqgrid-4.9.2.css" />
+    <Content Include="Content\JQG\grid.locale-en-4.9.2.js" />
+    <Content Include="Content\JQG\jquery.jqgrid.src-4.9.2.js" />
+    <Content Include="Content\jQUI\css\images\animated-overlay.gif" />
+    <Content Include="Content\jQUI\css\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\jQUI\css\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\jQUI\css\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\jQUI\css\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\jQUI\css\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\jQUI\css\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\jQUI\css\jquery-ui.1.12.0.css" />
+    <Content Include="Content\jQUI\css\jquery-ui.css" />
+    <Content Include="Content\jQUI\min\jquery-2.1.1.min.js" />
+    <Content Include="Content\jQUI\min\jquery-3.1.0.js" />
+    <Content Include="Content\jQUI\min\jquery-ui.1.11.4.min.js" />
+    <Content Include="Content\jQUI\min\jquery-ui.1.12.0.js" />
+    <Content Include="Content\Scripts\jquery.noty.packaged.v222.js" />
+    <Content Include="Content\Scripts\jquery.printElement.js" />
+    <Content Include="Content\Scripts\jquery.table.nav.1.0.js" />
+    <Content Include="Content\Scripts\jquery.validate.1.11.0.min.js" />
+    <Content Include="Content\Scripts\jquery.validate.1.14.0.js" />
+    <Content Include="Content\Scripts\json2.js" />
+    <Content Include="Content\Scripts\KO\knockout-2.2.0.js" />
+    <Content Include="Content\Scripts\KO\knockout-3.3.0.js" />
+    <Content Include="Content\Scripts\KO\knockout.mapping-latest.js" />
+    <Content Include="Content\Scripts\KO\KoExtra.js" />
+    <Content Include="Content\Scripts\mousetrap.min.js" />
+    <Content Include="Content\timeout\timeout-dialog.css" />
+    <Content Include="Content\timeout\timeout-dialog.js" />
+    <Content Include="Content\timeout\timeout-icon.png" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Scripts\common.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Content\Site.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Browsers\BrowserFile.browser">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Code\POTracking.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>POTracking.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Views\Activity\EditorTemplates\ActivityLog.cshtml" />
+    <Content Include="Views\Activity\Log.cshtml" />
+    <Content Include="Views\Common\Login.cshtml" />
+    <Content Include="Views\Common\NoAccess.cshtml" />
+    <Content Include="Views\Dashboard\Comments.cshtml" />
+    <Content Include="Views\Dashboard\KO\ListVendor.cshtml" />
+    <Content Include="Views\Dashboard\Excel.cshtml" />
+    <Content Include="Views\Dashboard\Files.cshtml" />
+    <Content Include="Views\Setting\EditorTemplates\SettingEdit.cshtml" />
+    <Content Include="Views\Setting\EditorTemplates\SettingVal.cshtml" />
+    <Content Include="Views\Setting\Manage.cshtml" />
+    <Content Include="Views\Shared\DataNotFound.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\ErrUserControl.cshtml" />
+    <Content Include="Views\Shared\LogOnUserControl.cshtml" />
+    <Content Include="Views\Shared\NoAccess.cshtml" />
+    <Content Include="Views\Shared\_SiteMasterLayout.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Common\Navigate.cshtml" />
+    <Content Include="Views\User\KO\UserList.cshtml" />
+    <Content Include="packages.config" />
+    <Content Include="Views\Dashboard\KO\ListInternal.cshtml" />
+    <Content Include="Views\Dashboard\List.cshtml" />
+    <Content Include="Content\Scripts\KOVM\DashboardKOscript.js" />
+    <Content Include="Views\Master\Manage.cshtml" />
+    <Content Include="Views\Master\MasterGrid.cshtml" />
+    <Content Include="Content\Scripts\KOVM\MasterGridKOscript.js" />
+    <Content Include="Views\Role\Manage.cshtml" />
+    <Content Include="Content\Scripts\KOVM\RoleGridKOscript.js" />
+    <Content Include="Views\Role\RoleGrid.cshtml" />
+    <Content Include="Views\Dashboard\Print.cshtml" />
+    <Content Include="Views\User\List.cshtml" />
+    <Content Include="Views\User\AddEdit.cshtml" />
+    <Content Include="Views\User\KO\UserKOscript.cshtml" />
+    <Content Include="Views\PO\Comments.cshtml" />
+    <Content Include="Views\PO\Files.cshtml" />
+    <Content Include="Views\PO\GetFile.cshtml" />
+    <Content Include="Views\PO\Info.cshtml" />
+    <Content Include="Content\Scripts\KOVM\CommentsFilesKOscript.js" />
+    <Content Include="Views\PO\Lines.cshtml" />
+    <Content Include="Views\PO\Manage.cshtml" />
+    <Content Include="Views\PO\Print.cshtml" />
+    <Content Include="Views\PO\PrintInternal.cshtml" />
+    <Content Include="Views\Dashboard\Status.cshtml" />
+    <Content Include="Views\PO\PrintPO.cshtml" />
+    <Content Include="Views\Dashboard\ListJQG.cshtml" />
+    <Content Include="Views\Dashboard\ListJQGold.cshtml" />
+    <None Include="Properties\PublishProfiles\HT-Dell.pubxml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Code\POTracking.dbml.layout">
+      <DependentUpon>POTracking.dbml</DependentUpon>
+    </None>
+    <None Include="Content\Images\page\Thumbs.db" />
+    <Content Include="Content\Images\asc.gif" />
+    <Content Include="Content\Images\dsc.gif" />
+    <Content Include="Content\favicon.ico" />
+    <Content Include="Content\Images\AOT Logo.jpg" />
+    <Content Include="Content\Images\aroB.gif" />
+    <Content Include="Content\Images\aroL.gif" />
+    <Content Include="Content\Images\down.gif" />
+    <Content Include="Content\Images\files.gif" />
+    <Content Include="Content\Images\comments.gif" />
+    <Content Include="Content\Images\list.gif" />
+    <Content Include="Content\Images\loading.gif" />
+    <Content Include="Content\Images\spacer.gif" />
+    <Content Include="Content\Scripts\jquery.taconite.js" />
+    <Content Include="Content\Scripts\jquery.tablesorter.min.js" />
+    <Content Include="EmailTemplates\ApplicationError.xml" />
+    <Content Include="EmailTemplates\POAssignTo.xml" />
+    <Content Include="EmailTemplates\ForgotPwd.xml" />
+    <Content Include="favicon.ico" />
+    <Content Include="Content\Scripts\jquery.form.js" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Start\" />
+    <Folder Include="Files\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target> -->
+  <Target Name="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(ProjectDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,99 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using POT.Services
+@using HSG.Helper
+@{  object routeValues = new { qData = Request["qData"] };
+    string reload = "return false;";
+    bool isVendor = _Session.IsOnlyVendor;       }
+<div style="width:99%; text-align:center" data-bind="visible:filteredRecords().length < 1">No records found</div>
+<table width="100%" class="thinBorder" data-bind="visible:filteredRecords().length > 0">
+    <thead class="header">
+    @*NOTE: DO NOT change column order without updating the Group logic variables below*@
+        <tr>
+            <th nowrap="nowrap" data-bind="click: function(data,event){$root.sortData(data, event,'POno')}">           
+            @Html.Raw(HttpUtility.HtmlDecode(Html.SortableColumn("PO #", "POno", reload, routeValues, true, false))) </th>
+            <th nowrap="nowrap" data-bind="click: function(data,event){$root.sortData(data, event,'POdt')}">
+            @Html.Raw(Html.SortableColumn("PO Date", "POdt", reload, routeValues))            
+            </th>
+            @if (!isVendor)
+            { 
+            <th nowrap="nowrap" data-bind="click: function(data,event){$root.sortData(data, event,'Vndr')}">
+            @Html.Raw(HttpUtility.HtmlDecode(Html.SortableColumn("Vendor", "Vndr", reload, routeValues)))
+            @* For future: reload(this.href,'','#main');*@</th>
+            }
+            <th nowrap="nowrap"data-bind="click: function(data,event){$root.sortData(data, event,'Ship')}">
+            @Html.Raw(Html.SortableColumn("Ship To City", "Ship", reload, routeValues))</th>            
+            <th nowrap="nowrap" data-bind="click: function(data,event){$root.sortData(data, event,'ETD')}">
+            @Html.Raw(HttpUtility.HtmlDecode(Html.SortableColumn("ETD", "ETD", reload, routeValues)))</th>
+            <th nowrap="nowrap" data-bind="click: function(data,event){$root.sortData(data, event,'ETA')}">
+            @Html.Raw(Html.SortableColumn("ETA", "ETA", reload, routeValues))</th>
+
+            <th nowrap="nowrap" data-bind="click: function(data,event){$root.sortData(data, event,'Status')}">
+            @Html.Raw(Html.SortableColumn("Status", "Status", reload, routeValues))</th>
+            @if (!isVendor){ 
+                <th nowrap="nowrap"data-bind="click: function(data,event){$root.sortData(data, event,'Cmts')}">
+                @Html.Raw(Html.SortableColumn("Comment", "Cmts", reload, routeValues))</th>
+            } 
+            <th nowrap="nowrap"data-bind="click: function(data,event){$root.sortData(data, event,'Files')}">
+            @Html.Raw(Html.SortableColumn("File", "Files", reload, routeValues))</th>            
+        </tr>
+    </thead>
+    @*<tbody> - DON'T because we'll add multiple tbody for group by *@
+    <tbody data-bind="foreach: pagedRows">@* POs *@
+    <tr>
+        <td align="center">            
+                <a title="Click to view this po" data-bind="text:$data.POno, 
+                attr:{href:'@Url.Action("Manage", "PO", new {POID = -99 })'.replace('-99', $data.ID)}">
+                </a>
+        </td>
+        <td align="center" data-bind="text:POdt"></td>
+        @if (!isVendor)
+        {<td align="center" data-bind="text:Vndr"></td>}
+         <td align="center" data-bind="text:Ship"></td> 
+        <td align="center" data-bind="text:ETD"></td>
+        <td align="center" data-bind="text:ETA"></td>        
+        <td align="center" nowrap="nowrap">
+        <div data-bind="attr: {id : 'dialog' + $data.ID}"></div>
+        <div class="noBorder dDialog uline" data-bind="click: function(data,event){showDialog('Status',$data.ID);poObj = this;},html:$data.Status, attr:{id:'statusDIV' + $data.ID}"></div>        
+        </td>
+        @if (!isVendor)
+        {
+         <td align="center">
+        <!-- ko if: Cmts -->         
+            <input type="image" src="@Url.Content("~/Content/Images/comments.gif")" alt="View Comments" title="View Comments"
+                data-bind="visible: Cmts, click: function(data,event){showDialog('Comments',$data.ID);return false;}" />
+        <!-- /ko -->
+        </td>
+        }
+        <td align="center">
+        <!-- ko if: Files -->         
+        <input type="image" src="@Url.Content("~/Content/Images/files.gif")" alt="View Files" title="View Files"
+                data-bind="visible: Files, click: function(data,event){showDialog('Files',$data.ID);return false;}"/>
+        <!-- /ko -->
+        </td>
+        @*<td align="center">
+            <input type="image" src="@Url.Content("~/Content/Images/Print.png")" alt="Print PO" title="Print PO"
+            data-bind="click: function(data,event){openPrintDialog($data.ID);return false;}" />
+        </td>*@
+    </tr>
+      </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="10" align="center">
+                <table cellpadding="0" cellspacing="0" class="pager noborder" style="width:100%" border="0">
+                    <tr>
+                        <td nowrap="nowrap" id="usrCount">
+                            &nbsp;Records : <span data-bind="text:filteredRecords().length"></span>, Page : <span data-bind="text:pageIndex()+1"></span>
+                        </td>
+                        <td>
+                           
+                        </td>
+                        <td align="right" width="98%" nowrap="nowrap">
+                        <div class="dDialog uline" data-bind="click: previousPage, visible: pageIndex() > 0">« prev</div> &nbsp;&nbsp;
+                        <div class="dDialog uline" data-bind="click: nextPage, visible: pageIndex() < maxPageIndex()">next »</div> &nbsp;
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </tfoot>
+</table>

@@ -1,0 +1,270 @@
+﻿@model POT.DAL.POInfoKOModel
+@using HSG.Helper
+@{bool isNewPO = (Model.Info.ID <= Defaults.Integer);}
+<script type="text/javascript">        
+        @* *********** Make sure common.js is included*********** *@
+        $().ready(function() {        
+        @*// Add client side validation*@
+        var validator = $("#frmPO").validate({@Defaults.validatorJQsetting,ignore: [], focusCleanup: false});           
+       });
+</script>
+<div id="divPOInfo" name="divPOInfo" data-bind="with:Info">
+    @using (Html.BeginForm("Manage", "PO", new { POID = Model.Info.ID }, FormMethod.Post, new { id = "frmPO" }))
+    {@Html.Hidden("ID", Model.Info.ID, new { data_bind = "value:ID" })
+        <fieldset class="fieldSet">
+            <legend class="SubHeading">Order Detail</legend>
+            <table align="left" cellpadding="2" cellspacing="2" width="100%" class="wideTX" id="tblnfo">
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        Date PO Placed :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.TextBox("PoPlacedDate", Model.Info.PoPlacedDate,
+                        new { data_bind = string.Format(Defaults.bindKOdatepicker, "PoPlacedDate") })
+                        @*"datepicker:PoPlacedDate, datepickerOptions: { minDate: minSQLDate, maxDate: maxSQLDate }"*@
+                        @Html.Hidden("PoPlacedDateStr", Model.Info.PoPlacedDateStr, new { data_bind = "value:PoPlacedDateStr" })
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        BL Number :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.BLNumber, new { data_bind = "value:BLNumber", @autofocus = "autofocus" })
+                        @Html.ValidationMessageFor(model => model.Info.BLNumber)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        Date LC Opened :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.TextBox("DateLcOpened", Model.Info.DateLcOpenedStr, new { data_bind = string.Format(Defaults.bindKOdatepicker, "DateLcOpened") })
+                        @Html.Hidden("DateLcOpenedStr", Model.Info.DateLcOpenedStr, new { data_bind = "value:DateLcOpenedStr" })
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        BL Date :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.TextBox("BLDate", Model.Info.BLDateStr, new { data_bind = string.Format(Defaults.bindKOdatepicker, "BLDate") })
+                        @Html.Hidden("BLDateStr", Model.Info.BLDateStr, new { data_bind = "value:BLDateStr" })
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        Filler Size :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @*Html.TextBox("FillerSize", Model.Info.FillerSize, new { data_bind = "value:FillerSize" })*@
+                        @Html.CustomTextBoxKOFor(m => m.Info.FillerSize,new { data_bind = "value:FillerSize" })
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        Carrier :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        <select id="CarrierID" class="dropDown required" data-bind="options: $parent.Carrier, value:CarrierID, optionsText: 'value', optionsValue:'id'">
+                        </select>
+                        <br />@Html.ValidationMessageFor(model => model.Info.CarrierID)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        Container Type :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        <select id="ContainerTypeId" class="dropDown required" data-bind="options: $parent.ContainerType, value:ContainerTypeId, optionsText: 'value', optionsValue:'id'">
+                        </select>
+                        <br />@Html.ValidationMessageFor(model => model.Info.ContainerTypeId)
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        Vessel :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.Vessel, new { data_bind = "value:Vessel" })
+                        @Html.ValidationMessageFor(model => model.Info.Vessel)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        ETD :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.TextBox("Etd", Model.Info.EtdStr, new { data_bind = string.Format(Defaults.bindKOdatepicker, "Etd") })
+                        @Html.Hidden("EtdStr", Model.Info.EtdStr, new { data_bind = "value:EtdStr" })
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        Container No :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.ContainerNo, new { data_bind = "value:ContainerNo" })
+                        @Html.ValidationMessageFor(model => model.Info.ContainerNo)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        ETA :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.TextBox("Eta", Model.Info.EtaStr, new { data_bind = string.Format(Defaults.bindKOdatepicker, "Eta") })
+                        @Html.Hidden("EtaStr", Model.Info.EtaStr, new { data_bind = "value:EtaStr" })
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        Seal No :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.SealNo, new { data_bind = "value:SealNo" })
+                        @Html.ValidationMessageFor(model => model.Info.SealNo)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        Factory PI :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.FactoryPI, new { data_bind = "value:FactoryPI" })
+                        @Html.ValidationMessageFor(model => model.Info.FactoryPI)
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        Weight/Kilos :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.Weight, new { data_bind = "value:Weight", @class = "integer" })
+                        @Html.ValidationMessageFor(model => model.Info.Weight)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" nowrap="nowrap">
+                        Status :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        <select id="OrderStatusID" class="dropDown required" data-bind="options: $parent.Status, value:OrderStatusID, optionsText: 'value', optionsValue:'id'">
+                        </select>
+                        @Html.Hidden("AssignToIDold", Model.Info.AssignToIDold, new { data_bind = "value:AssignToIDold" })
+                        @Html.Hidden("OrderStatusIDold", Model.Info.OrderStatusIDold, new { data_bind = "value:OrderStatusIDold" })
+                        @Html.ValidationMessageFor(model => model.Info.OrderStatusID)
+                        &nbsp;
+                        @if (!isNewPO)
+                        { 
+                            <div class="dDialog uline" onclick="showDialog('#ddlg');">
+                               Status History</div>@Html.Raw("&nbsp;")
+                            <div id="ddlg" style="text-align: right; ">
+                                <table class="thinBorder" align="center" width="99%" 
+                                style="display:none; padding-top: 10px" id="tblStatusHistory">
+                                    <thead class="header">
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Date</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bind="foreach : $parent.StatusHistory">
+                                        <tr>
+                                            <td align="center" data-bind="text:UserName"></td>
+                                            <td align="center" data-bind="date:LastModifiedDate"></td>
+                                            <td align="center" data-bind="text:OldStatus"></td>
+                                            <td align="center" data-bind="text:NewStatus"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> @*Show Status dialog*@
+                            <script type="text/javascript">
+                                function showDialog (containerID)
+                                {// Can't create and then open / close - because of issues with KO
+                                    $(containerID).dialog({
+                                        modal: false, @*autoOpen: false,*@
+                                        open: function () {
+                                            $("#tblStatusHistory").show();
+                                            @*$(this).html(loading);
+                                            $(this).load('@Url.Content("~/PO/")@(Model.Info.ID)/Status?IsReadOnly=true');*@
+                                            setTimeout(function () { $('.ui-dialog-titlebar-close').blur(); }, 1);
+                                        },
+                                        close: function (){$("#tblStatusHistory").hide();},
+                                        height: 360,
+                                        width: 650,
+                                        title: 'Status History'
+                                    });  
+                                }                              
+                            </script>                                    
+                        }
+                    </td>
+                    <td align="right" nowrap="nowrap">
+                        Pieces :&nbsp;
+                    </td>
+                    <td align="left" nowrap="nowrap">
+                        @Html.CustomTextBoxKOFor(m => m.Info.Pieces, new { data_bind = "value:Pieces", @class = "integer" })
+                        @Html.ValidationMessageFor(model => model.Info.Pieces)
+                    </td>
+                </tr>
+                <tr style="display: none;">
+                    <td colspan="4">
+                        @Html.TextBox("POGUID", Model.Info.POGUID, new { data_bind = "value:POGUID" })
+                        @Html.TextBox("AssignTo1", Model.Info.AssignTo, new { data_bind = "value:AssignTo" })
+                        <input type="button" value="Commit All" data-bind="click:$parent.SubmitData" class="button"
+                            id="btnCommit" name="btnCommit" />
+                    </td>
+                </tr>
+            </table>
+        </fieldset>        
+    }
+</div>
+<script type="text/javascript">
+    var poInfoViewModel = function () {
+        var self = this;
+        self.Info = ko.observable();
+        self.Carrier = ko.observableArray([]);
+        self.ContainerType = ko.observableArray([]);
+        self.Status = ko.observableArray([]);
+        self.StatusHistory = ko.observableArray([]);
+        
+        @* START: self.SubmitData *@
+        self.SubmitData = function (poObj) {
+            var proceed = $("#frmPO").valid();
+            if(proceed){ try{DisableSubmitButtons(true);}catch(e){}}
+            else { $('#tabs').tabs('option', 'active',2); }
+
+            if (proceed) {
+                showDlg(true);
+                var activeTab = $( "#tabs" ).tabs( "option", "active" );
+
+                ko.utils.postJson(location.href, 
+                { 
+                    isAddMode: @isNewPO.ToString().ToLower(),
+                    poObj: ko.mapping.toJS(poObj),
+                    //lines: ko.mapping.toJS(viewModelItems.allLines()),
+                    comments: ko.mapping.toJS(viewModelComments.allComments()),
+                    files: ko.mapping.toJS(viewModelFH.allFiles()),
+                    printPOAfterSave: printPOAfterSave,
+                    activeTab : activeTab 
+                });
+                return false;
+            }
+        }@* END: self.SubmitData *@
+    }
+      
+      var viewModelPOInfo = new poInfoViewModel();
+      function createPOInfoKO(data)
+      {        
+    @* Kept for sample reference
+    $.getJSON('@Html.Raw(Url.Action("POInfoKOVM", "PO", new { POGUID = ViewData["POGUID"] }))',
+        function (data) {*@
+            
+            setFocus("Info_BLNumber"); // required because this is the first focus !      
+            viewModelPOInfo.Info = ko.mapping.fromJS(data.Info);
+            viewModelPOInfo.Carrier = ko.mapping.fromJS(data.Carrier);
+            viewModelPOInfo.ContainerType = ko.mapping.fromJS(data.ContainerType);
+            viewModelPOInfo.Status = ko.mapping.fromJS(data.Status);
+            viewModelPOInfo.StatusHistory = ko.mapping.fromJS(data.StatusHistory);            
+             
+            ko.applyBindings(viewModelPOInfo, document.getElementById("divPOInfo"));        
+
+            @*// below dtp will be overwritten by : ko.bindingHandlers.datepicker so don't try
+            createjQDTP("PoPlacedDate");
+            createjQDTP("DateLcOpened");
+            createjQDTP("Etd");
+            createjQDTP("Eta");
+            createjQDTP("BLDate");*@
+
+            $("#tblnfo").tableNav();
+
+        return true;
+      }
+</script>

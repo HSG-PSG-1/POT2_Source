@@ -1,0 +1,192 @@
+﻿@model POT.DAL.Users
+@using System.Web.Mvc
+@using POT.Services
+@using HSG.Helper
+@using System.Collections
+@{ ViewBag.Title = "Add / Edit"; Layout = Defaults.masterLayout;}
+@section HeadContent {
+    <style>
+        .ui-autocomplete-loading
+        {
+            background: white url('http://jqueryui.com/demos/autocomplete/images/ui-anim_basic_16x16.gif') right center no-repeat;
+        }
+    </style>
+    <script type="text/javascript">
+        var validator;
+        function setupValidation() {//http://docs.jquery.com/Plugins/Validation/validate#options
+            // validate signup form on keyup and submit
+            validator = $("#frmUsr").validate({
+                ignore: ".ignore"//set this class
+                , @Defaults.validatorJQsetting
+                //, onfocusout: function (element) { $(element).valid(); }  SO: 8045731
+                , rules: {
+                    //Email: "required" or required: true, 
+                    Email: {
+                        remote: {
+                            url: '@Url.Action("Validate", "Common", new { src = "UserEmail" })', //, extras=Model.EmailOLD
+                            data: { term: function () {//Remove cached SO: 1564711
+                                /*$("#Email").removeData("previousValue");HT:CAUTION - will prevent form submission!
+                                https://github.com/jzaefferer/jquery-validation/issues/58*/
+                                //FIX: SO: 7329125/jquery-validate-remote-is-failing-cant-submit-form
+                                return $("#Email").val();
+                            },
+                                extras: function () { return $("#EmailOLD").val(); }
+                            }
+                        }
+                    }
+                }
+            , messages: { Email: { remote: "Duplicate email found"}/*, OrgName: "This field is required."*/ }
+                // the errorPlacement has to take the table layout into account 
+                , errorPlacement: function (error, element) {
+                    if (element.is(":radio")) error.appendTo(element.parent().next().next());
+                    else if (element.is(":checkbox")) error.appendTo(element.next());
+                    else error.appendTo(element.parent()); //.next()
+                }
+                //MORE for future: http://docs.jquery.com/Plugins/Validation/validate#options
+                //, invalidHandler: function(form, validator) { alert(validator.numberOfInvalids()); }
+            });        
+
+        }
+        function checkAndSubmit() {
+            document.getElementById('chkDone').checked = true;//For debug - alert('e:' + $("#frmUsr").validate().numberOfInvalids()); //validator.defaultShowErrors();
+            return true;
+        }
+    </script>
+}
+@{ bool IsEditMode = bool.Parse(ViewData["IsEditMode"].ToString());
+   string opr = IsEditMode ? "Edit" : "Add New";       
+}
+@using (Html.BeginForm("AddEdit", "Users", new { id = Model.ID }, FormMethod.Post, new { @id = "frmUsr", @name = "frmUsr", @onsubmit = "if($(this).valid())$('#btnSubmit').prop('disabled', true);" }))
+{
+    <table style="width: 50%" align="center">
+        <tr>
+            <td align="right">
+                <div class="small" style="text-align: right; margin: 0 auto;">
+                    *NOTE: All fields in <b>bold</b> are required</div>
+            </td>
+        </tr>
+        <tr>
+            <td align="left">
+                <table class="onlyBorder" cellpadding="4" cellspacing="4" width="100%">
+                    <thead class="header">
+                        <th colspan="2" align="center">
+                            <b class="smallHeading">@opr User Details</b>
+                        </th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2">
+                                @Html.ValidationSummary(true)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="bold" width="20%" align="right">
+                                @Html.LabelFor(model => model.Name)
+                            </td>
+                            <td width="80%">
+                                @Html.CustomTextBoxFor(model => model.Name, new { @autofocus = "autofocus" })
+                                @Html.ValidationMessageFor(model => model.Name)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="bold" align="right">
+                                @Html.LabelFor(model => model.RoleID)
+                            </td>
+                            <td>
+                                @(Html.DropDownListFor(model => model.RoleID, new SelectList((IEnumerable)ViewData["Roles"], "ID", "TEXT", Model.RoleID), new
+                {
+                    @class = "dropDown required",
+                    @onmouseup = "fillOrgs(true);" // alert(this.selectedIndex + ':' + $(this).attr('oldindex'));
+                }))
+                                @Html.ValidationMessageFor(model => model.RoleID)
+                                @Html.HiddenFor(model => model.OrgType, new { @class = "ignore" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="bold" align="right">
+                                @Html.LabelFor(model => model.OrgID)
+                            </td>
+                            <td>
+                                @Html.TextBox("OrgName", Model.OrgName, new { @class = "required", @style = "width:200px", @onblur = "return true;" })&nbsp;@Html.Raw(string.Format(Defaults.lookupImgBtn, "OrgName"))@Html.HiddenFor(model => model.OrgID)@Html.HiddenFor(model => model.OriOrgId)@Html.ValidationMessageFor(model => model.OrgID)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="bold" align="right">
+                                @Html.LabelFor(model => model.Email)
+                            </td>
+                            <td>
+                                @Html.CustomTextBoxFor(model => model.Email, new { @class = "email", @style = "width:200px" })
+                                @Html.ValidationMessageFor(model => model.Email)
+                                @Html.TextBoxFor(model => model.EmailOLD, new { @style = "display:none;" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="bold" align="right">
+                                @Html.LabelFor(model => model.Password)
+                            </td>
+                            <td>
+                                @Html.CustomTextBoxFor(model => model.Password, new { })
+                                @Html.ValidationMessageFor(model => model.Password)
+                            </td>
+                        </tr>
+                        @if (IsEditMode)
+                        { 
+                            <tr>
+                                <td colspan="2" nowrap="nowrap" align="center">
+                                    <img src="@Url.Content("~/Content/Images/spacer.gif")" height="1px" width="700px" /><br />
+                                    <i>@Html.LabelFor(model => model.LastModifiedBy)
+                                        :
+                                        @Model.LastModifiedByVal
+                                        @Html.HiddenFor(model => model.LastModifiedByVal, new { @class = "ignore" })
+                                        &nbsp;(@Model.LastModifiedDate.ToString(Defaults.dtTFormat, Defaults.ci))
+                                        @Html.Hidden("LastModifiedDate", Model.LastModifiedDate.ToString(Defaults.dtFormatNeutral),
+                        new { @class = "ignore" })
+                                    </i>
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="2" align="center">
+                                <input type="submit" id="btnSubmit" value="Save" class="button" onclick="return checkAndSubmit();" /><input
+                                    type="checkbox" id="chkDone" name="chkDone" style="display: none" />
+                                &nbsp;<input type="reset" value="Cancel" class="button" onclick="window.location.href='@Url.Action("List")'" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+}
+<script type="text/javascript">
+    function checkReq1(ctrl, impactCtrl) { if (!(ctrl.value.length > 0)) $("#" + impactCtrl).val(''); }
+
+    function fillOrgs(reset) {
+        var ddl = document.getElementById("RoleID");
+        var pos = (ddl.selectedIndex > 0) ? ddl.selectedIndex : 0;
+        doOrgsDDL(ddl.options[pos].value, reset); //refresh Orgs dll
+        //showSalesperson();//show or hide sp row
+    }
+
+    function doOrgsDDL(RoleId, reset) {
+        if (reset) { $("#OrgID").val(''); $("#OrgName").val(''); }
+        var urlPath = "@Defaults.commonRoot/Lookup?id=@LookupService.Source.Org.ToString()" +
+            "&extras=" + RoleId;
+        var idBox = "#OrgID", txtBox = "#OrgName";
+        renderAutoComplete(urlPath, idBox, txtBox); //refresh the autocomplete
+        //Need to have a custom select
+        $(txtBox).bind("autocompleteselect", function (event, ui) {
+            //set value if a valid item is selected
+            if (ui.item.id == null) { event.preventDefault(); }
+            else log(ui.item, idBox); $("#OrgType").val(ui.item.OrgTypeId);
+        });
+
+        //showHideLocations(false);//Disable Locations tab until a valid Customer ORg is selected
+    }
+
+    //Caching: http://developwithstyle.com/articles/2010/05/14/jquery-ui-autocomplete-is-it-any-good.html
+    $().ready(function () {
+        setupValidation(); //setup validation           
+        fillOrgs(false); //setup Org dropdown        
+    });     
+</script>

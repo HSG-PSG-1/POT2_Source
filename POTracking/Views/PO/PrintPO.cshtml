@@ -1,0 +1,279 @@
+﻿@*No cache headers*@
+@{ Response.CacheControl = "no-cache"; }
+@{ Response.AddHeader("Pragma", "no-cache"); }
+@{ Response.Expires = -1; }
+@*model POT.DAL.POInternalPrint*@
+@using POT.DAL
+@using HSG.Helper
+@{
+    /*vw_POHeader view = @Model.view;
+    //List<POComment> comments = @Model.comments;
+    //List<POFile> filesH = @Model.filesH;
+    List<vw_POLine> items = @Model.items;
+    */
+    string root = Defaults.getAbsSiteURL(Request.Url.ToString());
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>PO Print - Internal</title>
+    <link href="@root@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <style>
+        .spacing
+        {
+            margin: 5px 5px 5px 5px;
+        }
+        .spacing td
+        {
+            text-align: center;
+        }
+        html
+        {
+            overflow: scroll;
+        }
+        .noBorder tfoot tr td
+        {border:red;}
+    </style>
+    <script type="text/javascript">
+        window.initChildFrame = function (headerViewModel, linesViewModel, LinesOrderExtTotal, OrderTotal) {
+        //TotalAmtInvoiced
+            headerViewModel.LinesOrderExtTotal = ko.observable(parseFloat(LinesOrderExtTotal));
+            headerViewModel.OrderTotal = ko.observable(parseFloat(OrderTotal));
+            //window.ko = ko;
+            ko.applyBindings(headerViewModel, document.getElementById("tblPOHdr"));
+            ko.applyBindings(headerViewModel, document.getElementById("tblVendorShip"));
+            ko.applyBindings(headerViewModel, document.getElementById("tblfooter"));
+            ko.applyBindings(linesViewModel, document.getElementById("tblLines"));            
+            }
+    </script>
+</head>
+<body style="background-color: #ffffff; margin: 1px 1px 1px 1px;">
+    <div style="text-align: right" onclick="window.print();">
+        [ <a href="#">Print</a> ]</div>
+    <table width="100%" cellpadding="1" cellspacing="1">
+        <tr>
+            <td>
+                @*Report Header 1 : START*@
+                <table cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td>
+                            &nbsp;<img src="@root@Url.Content("~/Content/Images/AOT Logo.jpg")" alt="We make importing Tires easy!" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" class="small">
+                            <i>"We make importing Tires easy!"</i><br />
+                            &nbsp;
+                            <table align="center" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td nowrap="nowrap" align="center">
+                                        15354 Park Row<br />
+                                        Houston, Texas 77084 USA<br />
+                                        Tel.(281)600-TIRE(8473) Fax.(281)600-8475<br />
+                                        Email: sales@american-omni.com
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                @*Report Header 1 : END*@
+            </td>
+            <td width="50%">
+            </td>
+            <td align="center" nowrap="nowrap" align="right" valign="top">
+                @*Report Header 2 : START*@
+                <br />
+                <b class="PrintHeading">PURCHASE ORDER</b><br /><br />
+                <table align="right" id="tblPOHdr">
+                    <tr>
+                        <td>
+                            <table width="90%" cellpadding="6" cellspacing="3" align="left" data-bind="with: header">
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        ORDER DATE:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="date:PODate()"></b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        TERMS OF SALE:
+                                    </td>
+                                    <td nowrap1="nowrap">
+                                        <b data-bind="text:TermsDescription()"></b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        P.O.NUMBER:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="text:PONumber()"></b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        DELIVERY TERMS:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="text:FOB()"></b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        VENDOR NUMBER:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="text:VendorNumber()"></b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        ETA:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="date:Eta()"></b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        FREIGHT:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="text:ShipVia()"></b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        CONTAINER TYPE:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b data-bind="text:ContainerTypeCode()"></b>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                @*Report Header 2 : END*@
+            </td>
+        </tr>
+    </table>
+    <br />
+    <table width="100%" cellpadding="2" cellspacing="2">
+        <tr>
+            <td>
+                @* Vendor, ShipTo : START *@
+                <table class="thinBorder" width="100%" data-bind="with: header" id="tblVendorShip">
+                    <tr class="header smallBold">
+                        <th width="50%">
+                            VENDOR
+                        </th>
+                        <th width="50%">
+                            SHIP TO
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="uline" width="30%" style="text-decoration: none" nowrap="nowrap" valign="top">
+                        <span data-bind="html: (VendorName()!= null?VendorName():'') + '<br/>' + VendorAddress() + '<br/>Attn.:' + (ConfirmTo()!= null?ConfirmTo():'') + '<br/>Fax:' + (FaxNumber()!= null?FaxNumber():'')"></span>
+                            @*view.VendorName<br />@Html.Raw(view.VendorAddress)<br />
+                            Attn.:@view.ConfirmTo<br />
+                            Fax:@view.FaxNumber*@
+                        </td>
+                        <td valign="top">
+                            <span data-bind="html: (ShipToName()!= null?ShipToName():'') + '<br/>' + (ShipToAddress()!= null?ShipToAddress():'')"></span>
+                        </td>
+                    </tr>
+                </table>
+                @* Vendor, ShipTo : END *@
+            </td>
+        </tr>
+        <tr>
+            <td>                
+                <span class="small">&nbsp;</span>
+                
+@*Items : START *@
+                    <table width="100%" cellpadding="1" cellspacing="1">
+                        <thead class="header">
+                            <tr class="smallBold">
+                                <th class="uline" width="1%" nowrap="nowrap">
+                                    ITEM NUMBER
+                                </th>
+                                <th class="uline" nowrap="nowrap">
+                                    DESCRIPTION
+                                </th>
+                                <th class="uline" nowrap="nowrap">
+                                    ORDERED
+                                </th>
+                                <th class="uline" nowrap="nowrap">
+                                    UNIT COST
+                                </th>
+                                <th class="uline" nowrap="nowrap" align="right">
+                                    AMOUNT
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody align="center" data-bind="foreach: Lines()" id="tblLines" class="thinBorder">
+                            <td data-bind="text:ItemCode()"></td>
+                            <td data-bind="html:Description()"></td>
+                            @*<td align="right" data-bind="text:QtyOrdered() != null ? QtyOrdered() : 0"></td>*@
+                            <td align="right" data-bind="text:QtyOrdered() > 0 ? QtyOrdered() : ''"></td>
+                            @*<td align="right" data-bind="text:'$' + (UnitCost() != null ? UnitCost() : 0.00).toFixed(2)"></td>*@
+                            <td align="right" data-bind="text:UnitCost() > 0.00 ? '$'+ UnitCost().toFixed(2) : ''"></td>
+                            <td align="right" data-bind="text:OrderExtension() > 0.00 ? '$' + OrderExtension().toFixed(2) : ''"></td>
+                            </tbody>
+                        <tfoot class="noBorder" data-bind="with: header" id="tblfooter">
+                            @*Report Footer : START*@
+                            <tr>
+                                <td colspan="5" class="small">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>FILL SIZE: </td>
+                                <td><b data-bind="text:FillerSize()"></b></td>
+                                <td class="smallBold" align="right">Order Total: <b data-bind="text:$parent.OrderTotal()"></b></td>
+                                <td nowrap="nowrap" align="right" class="smallBold">Net Order:</td>
+                                <td align="right">$<span data-bind="html:$parent.LinesOrderExtTotal().toFixed(2)"></span></td>                                
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td nowrap="nowrap" align="right" class="smallBold">Frieght:</td>
+                                <td align="right" class="uline">$<span data-bind="html:FreightAmount().toFixed(2)"></span>                                
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td nowrap="nowrap" align="right"><b>Order Total:</b></td>
+                                <td align="right"> @*(FreightAmount() != null ? FreightAmount() : 0.00)*@
+                                    <b>$<span data-bind="html:($parent.LinesOrderExtTotal() + FreightAmount()).toFixed(2)"></span></b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="uline" colspan="2">
+                                </td>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <div class="small" style="margin-left:10px;"><i>American Omni Trading reserves the right not to accept delivery<br />
+                                        of this purchase order if it has not been properly authorized.</i></div>
+                                </td>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            @*Report Footer : END*@
+                        </tfoot>
+                    </table>
+@*Items : END *@               
+            </td>
+        </tr>
+    </table>
+</body>
+<script src="@Url.Content("~/Content/jQUI/min/jquery-3.1.0.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/Scripts/KO/knockout-3.3.0.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/Scripts/KO/knockout.mapping-latest.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/Scripts/KO/KoExtra.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    window.opener.invokeBinding(window);
+</script>
+</html>

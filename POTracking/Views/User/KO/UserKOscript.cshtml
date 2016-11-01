@@ -1,0 +1,282 @@
+﻿@using POT.Services
+@using HSG.Helper
+<script type="text/javascript">
+var loading = '<div style="text-align:center;display:block;"><img src=" @Url.Content("~/Content/Images/loading.gif")" title="" alt="Loading" /></div>';
+       
+@*function gotoUser(UserId)
+{
+    //window.location.href = "@HttpUtility.UrlDecode(Url.Action("Manage", "PO", new { POId = -99 }))".replace('-99',POId);
+}*@
+
+@* KO based pagination *@
+function updatePagedRows(vm)
+{// Starts with : index=0
+    ListURL = ListURL.replace("index=" + (vm.pageIndex()-1), "index=" + vm.pageIndex());
+    showDlg(true);
+    $.getJSON(ListURL, function (data) {
+            showDlg(false);
+            //viewModel.POs = ko.observableArray(data); // Initial items
+            //ko.applyBindings(viewModel);
+            if(data != null)
+            ko.utils.arrayForEach(data, function (item) {
+                vm_U.fields.push(item);
+            });
+            else
+                vm_U.pageIndex(0);//reset            
+        });
+}
+var oldEmail;
+var undoCache;
+var vmUser = function(){        
+        var self = this;
+        self.AllUsers =  ko.observableArray();//jsondata
+        self.pageSize = ko.observable(@ViewData["gridPageSize"]);
+        self.pageIndex = ko.observable(0);
+        self.cachedPagesTill = ko.observable(0);
+        self.sortField = ko.observable("Name");
+        self.sortOrderNxtAsc = ko.observable(true);
+        self.search = ko.observable();
+        self.showGrid = ko.observable(true);
+        self.invokeSearch = ko.observable(2);
+        self.invokeEditRec = ko.observable(6);
+        self.roles =  ko.observableArray();//jsondata
+        
+        self.addNew = function () {       
+             
+            self.AllUsers.push(ko.mapping.fromJS(self.newRecord()));//cloneObservable
+            self.invokeEditRec(0);
+            self.showGrid(false);   $("#usrAddEditDialog").dialog("open");
+            oldEmail = "";
+            return true;
+        };
+
+        self.setEditing = function (user) {
+        //cache for undo
+        undoCache = cloneObservable(user);
+
+        for (var i = 0; i < self.AllUsers().length; i++) {
+            if (self.AllUsers()[i].ID() == user.ID())
+                self.AllUsers()[i].Editing(true);
+            else
+                self.AllUsers()[i].Editing(false);
+            }
+            user.LastModifiedDate(Date111);
+            self.invokeEditRec(4);
+            self.showGrid(false);   $("#usrAddEditDialog").dialog("open");
+
+            fillOrgs(false); //setup Org dropdown and sp
+            setFocus("Name");
+
+            oldEmail = user.Email();
+        };
+
+        self.saveEdit = function (user) {
+            // HT: Won't work for KO dialog need to trigger email validation explicitly
+            if(!$("#frmUsr").valid())//$('#btnSubmit').prop('disabled', true);            
+                return;
+
+            if (user.UserName == null || user.UserName() == "")   alert("Name is a required field");
+            else if (user.RoleID() == null)   alert("Role is a required field");
+            else if (user.OrgID() == null)   alert("Organization is a required field");
+            else if (user.Email == null || user.Email() == "")   alert("Email is a required field");
+            else if (user.Password == null || user.Password() == "")   alert("Password is a required field");
+            else {
+                
+                // trigger AJAX save by POST and get back the inserted \ updated user record
+                // show loading dialog
+                // successful return then reset edited
+                // if success show message else if error then show message
+                // stop loading
+
+                $("#OrgName").trigger("change");
+                var IsEdit = user.ID() > 0;
+                showDlg(true);
+                $.post('@Url.Action("AddEditKO", "User")', { usr: ko.mapping.toJSON(user)},  
+                    function (usr) {      
+                    showDlg(false);                     
+                        if(usr == false) {alert("Invalid data or duplicate email."); return;}
+
+                        @* SQL does it as - CASE o.OrgTypeId WHEN 1 THEN 'Internal' WHEN 2 THEN 'Vendor' END *@
+                        @Html.Raw(UserService.orgTypeJS)
+                        //if(user.OrgTypeId() == 1)user.OrgType("Internal"); else if(user.OrgTypeId() == 2)user.OrgType("Vendor");
+                        //setDDLtext("#ddlRoles", "RoleName"); // shud trigger the change instead of user.RoleName("Admin")
+                        
+                        usr.OrgType = user.OrgType();
+                        usr.RoleName = $('#ddlRoles option:selected').text(); // SO: 10289721
+
+                        var old;    var usrID = IsEdit ? usr.ID : self.newRecord().ID;                        
+                        old = ko.utils.arrayFirst(self.AllUsers(), function (usrObj) {return usrObj.ID() == usrID; });                                 
+                        
+                        //user.Editing(false); user.Edited(true); Handled in the server action AddEditKO
+                        self.AllUsers.replace(old, ko.mapping.fromJS(usr));
+
+                        
+                        self.invokeEditRec(1);
+                        self.showGrid(true);    $("#usrAddEditDialog").dialog("close");
+
+                        undoCache = null;   oldEmail = "";
+                    });       
+
+                
+            }
+
+            var s = self.invokeSearch();self.invokeSearch(0);
+        };
+
+        self.removeSelected = function (user) {        
+            if (user == null || user.ID() < 1)
+               { alert("Invalid operation"); return; } // Prevent blanks and duplicates
+
+            var data = {}; data["UserId"] = user.ID();
+            showDlg(true);
+            $.post('@Url.Action("UserKODelete", "User", new { ID = "" })', data,  
+                    function (result) {
+                    showDlg(false);
+                       if(deleteSuccess)
+                       {
+                           self.AllUsers.remove(user);
+                           deleteSuccess = false;
+                       }
+                    //alert(result); HT: we can notify user if a succesful email was sent
+                    }
+            );
+        };
+
+        self.cancelEdit = function (user) {
+            user.Editing(false); user.Edited(false);
+            
+            if (user.ID() != null && user.ID() < 1) 
+                self.AllUsers.pop();
+            else 
+            {                
+                //undoCache = cloneObservable(user);
+                self.AllUsers.replace(user, ko.mapping.fromJS(undoCache)); // cloneObservable
+                undoCache = null;
+            }
+
+            self.showGrid(true);    $("#usrAddEditDialog").dialog("close");
+
+            self.invokeEditRec(2);
+            oldEmail = "";
+        };
+
+        self.editRecord = ko.computed(function() {
+            var e = self.invokeEditRec();self.invokeEditRec(3);
+            return ko.utils.arrayFilter(self.AllUsers(), function(rec) {           
+                return (rec.Editing() != null && rec.Editing());
+                });
+        });        
+        
+        self.opr = ko.computed(function() {
+            var e = self.invokeEditRec();self.invokeEditRec(5); // To refresh it when property change
+            if(self.editRecord() != null && self.editRecord().length > 0)
+                return self.editRecord()[0].ID() > 0?"Edit" : "Add";
+            else
+                return "";
+        });
+
+        self.previousPage = function() {
+            self.pageIndex(self.pageIndex() - 1);
+            if(self.cachedPagesTill() < 1)
+                self.cachedPagesTill(0);
+            self.cachedPagesTill(self.cachedPagesTill() + 1);
+        };
+        self.nextPage = function() {            
+            self.pageIndex(self.pageIndex() + 1);            
+            //if(self.cachedPagesTill() < 1)
+            //    updatePagedRows(self);
+            self.cachedPagesTill(self.cachedPagesTill() - 1);
+        };
+
+        self.filteredRecords = ko.computed(function() {
+            var s = self.invokeSearch();self.invokeSearch(0);
+            
+            var s = self.search;
+
+            var OrgType = (s.OrgType != null && s.OrgType() != null && s.OrgType() != "")?s.OrgType().toLowerCase():null;
+            var UserName = (s.UserName != null && s.UserName() != null && s.UserName() != "")?s.UserName().toLowerCase():null;
+            var Email = (s.Email != null && s.Email() != null && s.Email() != "")?s.Email().toLowerCase():null;
+            var RoleID = (s.RoleID != null && s.RoleID() != null && s.RoleID() != "")?s.RoleID():0;
+            
+            self.pageIndex(0);
+                        
+            return ko.utils.arrayFilter(self.AllUsers(), function(rec) {
+                return (
+                    (OrgType == null || rec.OrgType().toLowerCase().indexOf(OrgType) > -1) &&
+                    (UserName == null || rec.UserName().toLowerCase().indexOf(UserName) > -1) &&                    
+                    (Email == null || rec.Email().toLowerCase().indexOf(Email) > -1) &&                    
+                    (RoleID < 1 || rec.RoleID() == RoleID)
+                );
+            });                        
+        });
+
+        self.maxPageIndex = ko.computed(function() {//dependentObservable
+            var s = self.invokeSearch();self.invokeSearch(0);
+            return Math.ceil(self.filteredRecords().length / self.pageSize()) - 1;
+        });
+
+        self.pagedRows = ko.computed(function() {//dependentObservable
+                var size = self.pageSize();
+                var start = self.pageIndex() * size;
+                return self.filteredRecords().slice(start, start + size);
+        });
+
+        self.sortData = function(data, event, sort)
+        {
+            var s = self.invokeSearch();self.invokeSearch(0);
+
+            if((self.sortField() == sort))
+                self.sortOrderNxtAsc(!self.sortOrderNxtAsc());
+            else
+                {self.sortField(sort); self.sortOrderNxtAsc(false);}
+            
+            var sortOrder = self.sortOrderNxtAsc()? -1 : 1; // Asc : Desc
+
+            @*"click: function(data,event){fields.sort(function (l, r) { return l.Status > r.Status ? 1 : -1 })}"*@
+            switch (sort)
+            {
+            case "OrgType":
+                 self.AllUsers.sort(function (l, r) { return l.OrgType() > r.OrgType() ? 1*sortOrder : -1*sortOrder });                
+                 break;
+            case "RoleName": // Need to convert into string while comparison
+                self.AllUsers.sort(function (l, r) { return l.RoleName() + "" > r.RoleName() + "" ? 1*sortOrder : -1*sortOrder });                
+                break;
+            case "UserName":
+                self.AllUsers.sort(function (l, r) { return l.UserName() > r.UserName() ? 1*sortOrder : -1*sortOrder });                
+                break;
+            case "Email":
+                  self.AllUsers.sort(function (l, r) { return l.Email() > r.Email() ? 1*sortOrder : -1*sortOrder });                  
+                  break;            
+            }  
+            
+            $(".header tr th").each(function(i){
+                $(this).html($(this).html().replace("▲",""));
+                $(this).html($(this).html().replace("▼",""));
+                @*$(this).html($(this).html().replace("&#9650;","&#9660;"));*@
+        
+                if($(this).html().indexOf(vm_U.sortField()) > -1)
+                    $(this).html($(this).html() + " " + (vm_U.sortOrderNxtAsc()?"▼": "▲"));
+            });
+
+            self.pageIndex(0);  self.cachedPagesTill(0);
+        }
+    };
+    var delID=-1;var isDel = false; var usrIDToDel = "";
+        function doUserDelPost(txtId, txtVal) {
+            if(!isDel){@*alert("doUserDelPost:" + txtVal);*@ return true;}
+            else isDel = false;
+            
+            var data = {}; data[txtId] = txtVal;
+            var url = '@Url.Action("UserKODelete", "User", new { ID = "" })';
+            $.post(url, data);
+
+            usrIDToDel = txtVal;
+
+            return false; // prevent any postback
+        }
+        function doDelPost(txtId, txtVal) {
+            isDel = true;
+        }
+        var deleteSuccess = false;
+        function removeUser(){ deleteSuccess = true; }//doFurtherProcessing
+</script>

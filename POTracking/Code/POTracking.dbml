@@ -1,0 +1,486 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="POTracking" EntityNamespace="POT.DAL" ContextNamespace="POT.DAL" Class="POTmodel" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=(local);Initial Catalog=POTracking;Persist Security Info=True;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="POTConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.ActivityHistory" Member="ActivityHistories">
+    <Type Name="ActivityHistory">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ActivityID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="PONumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="PODetailID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ItemNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="FileName" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="ActDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserText" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ActivityType" Member="ActivityTypes">
+    <Type Name="ActivityType">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterBrand" Member="MasterBrands">
+    <Type Name="MasterBrand">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterCarrier" Member="MasterCarriers">
+    <Type Name="MasterCarrier">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterContainerType" Member="MasterContainerTypes">
+    <Type Name="MasterContainerType">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterFileType" Member="MasterFileTypes">
+    <Type Name="MasterFileType">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterItem" Member="MasterItems">
+    <Type Name="MasterItem">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(15) NOT NULL" CanBeNull="false" />
+      <Column Name="Type" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="BrandID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Uom" Type="System.String" DbType="NVarChar(4)" CanBeNull="true" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterOrderType" Member="MasterOrderTypes">
+    <Type Name="MasterOrderType">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterShipVia" Member="MasterShipVias">
+    <Type Name="MasterShipVia">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterStatus" Member="MasterStatus">
+    <Type Name="MasterStatus">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterTerms" Member="MasterTerms">
+    <Type Name="MasterTerm">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MasterWarehouse" Member="MasterWarehouses">
+    <Type Name="MasterWarehouse">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Organization" Member="Organizations">
+    <Type Name="Organization">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(7) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="OrgTypeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.OrgType" Member="OrgTypes">
+    <Type Name="OrgType">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.POComment" Member="POComments">
+    <Type Name="POComment">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PostedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Comment" Member="Comment1" Storage="_Comment" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PODetail" Member="PODetails">
+    <Type Name="PODetail">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LinkToPreviousLine" Type="System.Decimal" DbType="Decimal(11,0)" CanBeNull="true" />
+      <Column Name="LinkToNextLine" Type="System.Decimal" DbType="Decimal(11,0)" CanBeNull="true" />
+      <Column Name="ItemID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ExtendedItemNumber" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="LineType" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="RequiredDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="UnitOfMeasure" Type="System.String" DbType="NVarChar(4)" CanBeNull="true" />
+      <Column Name="WarehouseCode" Type="System.String" DbType="NVarChar(3)" CanBeNull="true" />
+      <Column Name="ProductLine" Type="System.String" DbType="NVarChar(4)" CanBeNull="true" />
+      <Column Name="ExtendedDescription" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="Weight" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="VendorAliasItemNumber" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="QtyOrdered" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="QtyReceived" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="QtyBckordrd" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="UnitCost" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="OrderExtension" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="UMConversionFactor" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="AmountInvoiced" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="QtyInvoiced" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="ItemNumber" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.POFile" Member="POFiles">
+    <Type Name="POFile">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FileType" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FileName" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="UploadDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Comment" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.POHeader" Member="POHeaders">
+    <Type Name="POHeader">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PONumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="PODate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="OrderTypeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Division" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="VendorID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="VendorNumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="VendorName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorAddress1" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorAddress2" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorAddress3" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorCity" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="VendorState" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="VendorZipCode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorCountryCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="VendorCountryName" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="FaxNumber" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToName" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToAddress1" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToAddress2" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToAddress3" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToCity" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToState" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="ShipToZipCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ShipToCountryCodeId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ShipToCountryCode" Type="System.String" DbType="NVarChar(3)" CanBeNull="true" />
+      <Column Name="OrderStatusID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ShipViaID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FOB" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="WarehouseCodeId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ConfirmTo" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="Comment" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="TermsCodeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="UserID" Type="System.String" DbType="NVarChar(3)" CanBeNull="true" />
+      <Column Name="TaxableAmount" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="NonTaxableAmount" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="SalesTaxAmount" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="FreightAmount" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="ContainerNo" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ContainerTypeId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DateLcOpened" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Eta" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Etd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="FillerSize" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PoPlacedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="BLNumber" Type="System.String" DbType="NVarChar(25)" CanBeNull="true" />
+      <Column Name="BLDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CarrierID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Vessel" Type="System.String" DbType="NVarChar(25)" CanBeNull="true" />
+      <Column Name="SealNo" Type="System.String" DbType="NVarChar(25)" CanBeNull="true" />
+      <Column Name="Weight" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Pieces" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Archived" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="AssignTo" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BrandID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FactoryPI" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="CommentsExist" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FilesHExist" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.POStatusHistory" Member="POStatusHistories">
+    <Type Name="POStatusHistory">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OldStatusID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NewStatusID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Setting" Member="Settings">
+    <Type Name="Setting">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Value" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserRole" Member="UserRoles">
+    <Type Name="UserRole">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="OrgTypeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ManageRole" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ManageMaster" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ManageUser" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeletePO" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ViewActivity" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ManageSetting" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CanDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="Users">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RoleID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OrgID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Password" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_Users_Role_Org" Member="vw_Users_Role_Orgs">
+    <Type Name="vw_Users_Role_Org">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="RoleID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OrgID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Password" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="RoleName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="OrgTypeId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OrgType" Type="System.String" DbType="VarChar(8)" CanBeNull="true" />
+      <Column Name="OrgName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedByName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_StatusHistory_Usr" Member="vw_StatusHistory_Usrs">
+    <Type Name="vw_StatusHistory_Usr">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OldStatusID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NewStatusID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="OldStatus" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="NewStatus" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_Org_Roles" Member="vw_Org_Roles">
+    <Type Name="vw_Org_Role">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(7) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="OrgTypeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="RoleId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_MasterOrg_Role" Member="vw_MasterOrg_Roles">
+    <Type Name="vw_MasterOrg_Role">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(7) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="OrgTypeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="RoleId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_ActivityLog" Member="vw_ActivityLogs">
+    <Type Name="vw_ActivityLog">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ActivityID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserText" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="ActDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="PODetailID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="PONumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="FileName" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="Activity" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_PO_Dashboard" Member="vw_PO_Dashboards">
+    <Type Name="vw_PO_Dashboard">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PONumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="PODate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ShipToCity" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToName" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="Eta" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Etd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="AssignTo" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="CommentsExist" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FilesHExist" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="OrderStatusID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Status" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="VendorID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="VendorName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="BrandID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BrandName" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="Archived" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_POHeader" Member="vw_POHeaders">
+    <Type Name="vw_POHeader">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PONumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="PODate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Division" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="ShipToCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToName" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToAddress1" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToAddress2" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToAddress3" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipToCity" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ShipToState" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="ShipToZipCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ShipToCountryCodeId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ShipToCountryCode" Type="System.String" DbType="NVarChar(3)" CanBeNull="true" />
+      <Column Name="FOB" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="ConfirmTo" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="ShipViaID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="TermsCodeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="UserID" Type="System.String" DbType="NVarChar(3)" CanBeNull="true" />
+      <Column Name="AssignTo" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="AssignToVal" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ShipVia" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="Term" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="VendorID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="VendorCode" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="VendorNumber" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="VendorName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorAddress1" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorAddress2" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorAddress3" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorCity" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="VendorState" Type="System.String" DbType="NVarChar(2)" CanBeNull="true" />
+      <Column Name="VendorZipCode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="FaxNumber" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="OrderStatusID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="VendorCountryCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="VendorCountryName" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="Archived" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedBy" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="LastModifiedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Eta" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Etd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="FillerSize" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="FreightAmount" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="TermsDescription" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="ContainerTypeCode" Type="System.String" DbType="NVarChar(80) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_POLines" Member="vw_POLines">
+    <Type Name="vw_POLine">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="POID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ItemID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ExtendedItemNumber" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="LineType" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="UnitOfMeasure" Type="System.String" DbType="NVarChar(4)" CanBeNull="true" />
+      <Column Name="WarehouseCode" Type="System.String" DbType="NVarChar(3)" CanBeNull="true" />
+      <Column Name="ExtendedDescription" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="QtyOrdered" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="QtyReceived" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="UnitCost" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="OrderExtension" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="Brand" Type="System.String" DbType="NVarChar(80)" CanBeNull="true" />
+      <Column Name="Weight" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ProductLine" Type="System.String" DbType="NVarChar(4)" CanBeNull="true" />
+      <Column Name="QtyBckordrd" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="AmountInvoiced" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="QtyInvoiced" Type="System.Decimal" DbType="Decimal(15,4)" CanBeNull="true" />
+      <Column Name="ItemCode" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="ItemDescription" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="BrandID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>

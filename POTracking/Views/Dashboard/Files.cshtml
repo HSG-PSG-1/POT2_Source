@@ -1,0 +1,37 @@
+﻿@model List<POT.DAL.POFile>
+@using HSG.Helper
+<table class="thinBorder" width="99%">
+    <thead class="header">
+        <tr>
+            <th>File</th>
+            <th>Type</th>
+            <th>Comment</th>
+            <th nowrap="nowrap">Uploaded By</th>
+            <th nowrap="nowrap">Uploaded Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>        
+            @foreach (var item in Model){ 
+         <tr>
+            <td>@item.FileName</td>
+            <td>@item.FileTypeTitle</td>
+            <td>@item.Comment</td>
+            <td>@item.UploadedBy</td>
+            <td>@item.UploadDate.ToString(Defaults.dtFormat, Defaults.ci)</td>
+            <td>
+               @if (!string.IsNullOrEmpty(item.FileName) && item.POID > 0){
+                   string codeStr = FileIO.getFileDownloadCode(item.FileName, item.POID, item.POGUID);
+                   string clipImgLink = string.Format(Defaults.clipImgLink,
+                       //HttpUtility.UrlDecode(Url.Action("GetFile?" + codeStr, "PO", new { POID = item.POID }))
+                       Url.Action("GetFile", "PO") + "?" + item.CodeStr
+                       );
+                        @Html.Raw(clipImgLink)                        
+               }            
+            </td>
+        </tr>
+            }
+    </tbody>
+    <tfoot>@Html.Raw(Defaults.chkNoRecords(Model.Count(), 6))</tfoot>
+</table>
+

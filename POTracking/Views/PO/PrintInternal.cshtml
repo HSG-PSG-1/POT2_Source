@@ -1,0 +1,273 @@
+﻿@model POT.DAL.POInternalPrint
+@using POT.DAL
+@using HSG.Helper
+
+@*No cache headers*@
+@{ Response.CacheControl = "no-cache"; }
+@{ Response.AddHeader("Pragma", "no-cache"); }
+@{ Response.Expires = -1; }
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+@{  vw_POHeader view = @Model.view;
+    //List<POComment> comments = @Model.comments;
+    //List<POFile> filesH = @Model.filesH; 
+    string root = Defaults.getAbsSiteURL(Request.Url.ToString());
+    var items = @Model.items; // declaring List<vw_POLine> - causes weird compiler error
+}
+    <title>PO Print - Internal</title>
+    <link href="@root@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <style>
+        .spacing
+        {
+            margin: 5px 5px 5px 5px;
+        }
+        .spacing td
+        {
+            text-align: center;
+        }
+        html
+        {
+            overflow: scroll;
+        }
+        .noBorder tfoot tr td
+        {border:red;}
+    </style>
+</head>
+<body style="background-color: #ffffff; margin: 1px 1px 1px 1px;">
+    <div style="text-align: right" onclick="window.print();">
+        [ <a href="#">Print</a> ]</div>
+    <table width="100%" cellpadding="1" cellspacing="1">
+        <tr>
+            <td>
+                @*Report Header 1 : START*@
+                <table cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td>
+                            &nbsp;<img src="@root@Url.Content("~/Content/Images/AOT Logo.jpg")" alt="We make importing Tires easy!" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" class="small">
+                            <i>"We make importing Tires easy!"</i><br />
+                            &nbsp;
+                            <table align="center" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td nowrap="nowrap" align="center">
+                                        15354 Park Row<br />
+                                        Houston, Texas 77084 USA<br />
+                                        Tel.(281)600-TIRE(8473) Fax.(281)600-8475<br />
+                                        Email: sales@american-omni.com
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                @*Report Header 1 : END*@
+            </td>
+            <td width="50%">
+            </td>
+            <td align="center" nowrap="nowrap" align="right" valign="top">
+                @*Report Header 2 : START*@
+                <br />
+                <b class="PrintHeading">PURCHASE ORDER</b><br /><br />
+                <table align="right">
+                    <tr>
+                        <td>
+                            <table width="90%" cellpadding="6" cellspacing="3" align="left">
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        ORDER DATE:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.PODate.Value.ToString(Defaults.dtFormat, Defaults.ci)</b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        TERMS OF SALE:
+                                    </td>
+                                    <td nowrap1="nowrap">
+                                        <b>@view.TermsDescription</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        P.O.NUMBER:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.PONumber</b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        DELIVERY TERMS:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.FOB</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        VENDOR NUMBER:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.VendorNumber</b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        ETA:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.Eta.Value.ToString(Defaults.dtFormat, Defaults.ci)</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" align="right">
+                                        FREIGHT:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.ShipVia</b>
+                                    </td>
+                                    <td>&nbsp;&nbsp;</td>
+                                    <td nowrap="nowrap" align="right">
+                                        CONTAINER TYPE:
+                                    </td>
+                                    <td nowrap="nowrap">
+                                        <b>@view.ContainerTypeCode</b>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                @*Report Header 2 : END*@
+            </td>
+        </tr>
+    </table>
+    <br />
+    <table width="100%" cellpadding="2" cellspacing="2">
+        <tr>
+            <td>
+                @* Vendor, ShipTo : START *@
+                <table class="thinBorder" width="100%">
+                    <tr class="header smallBold">
+                        <th width="50%">
+                            VENDOR
+                        </th>
+                        <th width="50%">
+                            SHIP TO
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="uline" width="30%" style="text-decoration: none" nowrap="nowrap" valign="top">
+                            @view.VendorName<br />@Html.Raw(view.VendorAddress)<br />
+                            Attn.:@view.ConfirmTo<br />
+                            Fax:@view.FaxNumber
+                        </td>
+                        <td valign="top">
+                            @view.ShipToName<br />@Html.Raw(view.ShipToAddress)
+                        </td>
+                    </tr>
+                </table>
+                @* Vendor, ShipTo : END *@
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @*<div style="text-align: right">Total Items :<%= items.Count.ToString() %></div>*@
+                <span class="small">&nbsp;</span>
+                @if (items.Count > 0 || true)
+                {
+@*Items : START *@
+                    <table width="100%" cellpadding="1" cellspacing="1">
+                        <thead class="header">
+                            <tr class="smallBold">
+                                <th class="uline" width="1%" nowrap="nowrap">
+                                    ITEM NUMBER
+                                </th>
+                                <th class="uline" nowrap="nowrap">
+                                    DESCRIPTION
+                                </th>
+                                <th class="uline" nowrap="nowrap">
+                                    ORDERED
+                                </th>
+                                <th class="uline" nowrap="nowrap">
+                                    UNIT COST
+                                </th>
+                                <th class="uline" nowrap="nowrap" align="right">
+                                    AMOUNT
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody align="center" class="thinBorder">
+                            @foreach (var item in items)
+                            {
+                                <tr>
+                                    <td nowrap="nowrap">@item.ItemCode
+                                    </td>
+                                    <td>
+                                        &nbsp;@Html.Raw(item.Description)
+                                    </td>
+                                    <td nowrap="nowrap">@((item.QtyOrdered ?? 0.0M).ToString("#0"))
+                                    </td>
+                                    <td nowrap="nowrap">$@((item.UnitCost ?? 0.0M).ToString("#0.00"))
+                                    </td>
+                                    <td nowrap="nowrap" align="right">$@((item.OrderExtension ?? 0.0M).ToString("#0.00"))
+                                    </td>
+                                </tr>                            
+                            }
+                        </tbody>
+                        <tfoot class="noBorder">
+                            @*Report Footer : START*@
+                            @{
+                    decimal LinesOrderExtTotal
+                                = items.Sum(i => Math.Round(i.OrderExtension ?? 0.0M, 2));// .Where(c => !c._Deleted)
+                            }
+                            <tr>
+                                <td colspan="5" class="small">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>FILL SIZE: </td>
+                                <td colspan="2"><b>@view.FillerSize</b></td>
+                                <td nowrap="nowrap" align="right" class="smallBold">Net Order:</td>
+                                <td align="right">$@LinesOrderExtTotal.ToString("#0.00")</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td nowrap="nowrap" align="right" class="smallBold">Frieght:</td>
+                                <td align="right" class="uline">$@((view.FreightAmount ?? 0.00M).ToString("#0.00"))</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td nowrap="nowrap" align="right"><b>Order Total:</b></td>
+                                <td align="right">
+                                    <b>$@Html.Raw((LinesOrderExtTotal + view.FreightAmount ?? 0.0M).ToString("#0.00"))</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="uline" colspan="2">
+                                </td>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <div class="small" style="margin-left:10px;"><i>American Omni Trading reserves the right not to accept delivery<br />
+                                        of this purchase order if it has not been properly authorized.</i></div>
+                                </td>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            @*Report Footer : END*@
+                        </tfoot>
+                    </table>
+@*Items : END *@
+                }
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

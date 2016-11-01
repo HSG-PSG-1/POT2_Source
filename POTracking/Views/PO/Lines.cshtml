@@ -1,0 +1,76 @@
+﻿@using HSG.Helper
+@{string showToInternal = !_Session.IsAsiaVendor ? "" : "style='display:none'";}
+<div id="divLines">
+    @* Lines : START *@
+    <table class="thinBorder" width="99%" id="tblLines">
+        <thead class="header">
+            <tr>
+                <th nowrap="nowrap">
+                    Item number
+                </th>
+                <th>
+                    Whse
+                </th>
+                <th>
+                    UOM
+                </th>
+                <th>
+                    Description
+                </th>
+                <th width="1%">
+                    Ordered
+                </th>
+                <th width="1%">
+                    Shipped
+                </th>
+                <th nowrap="nowrap" width="1%">
+                    Unit Cost
+                </th>
+                <th width="1%">
+                    Extension
+                </th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: Lines()">
+            <td data-bind="text:ItemCode"></td>
+            <td data-bind="text:WarehouseCode"></td>
+            <td data-bind="text:UnitOfMeasure"></td>
+            <td data-bind="html:Description"></td>
+            @*<td align="right" data-bind="text:QtyOrdered() != null ? QtyOrdered() : '0.00'"></td>*@
+            <td align="right" data-bind="text:QtyOrdered() > 0 ? QtyOrdered() : ''"></td>
+            @*<td align="right" data-bind="text:QtyReceived() != null ? QtyReceived() : '0.00'"></td>*@
+            <td align="right" data-bind="text:QtyOrdered() > 0 ? QtyReceived() : ''"></td>
+            @*<td align="right" data-bind="text:UnitCost() != null ? formatDecimal(UnitCost()) : '0.00'"></td>*@
+            <td align="right" data-bind="text:UnitCost() > 0.00 ? UnitCost().toFixed(2) : ''"></td>
+            <td align="right" data-bind="text:OrderExtension() > 0.00 ? OrderExtension().toFixed(2) : ''"></td>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7" align="right">
+                    Total:
+                </td>
+                <td align="right" data-bind="text:LinesOrderExtTotal">
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    @* Lines : END *@
+</div>
+<script type="text/javascript">
+    var linesViewModel = function () {
+        var self = this;
+        self.Lines = ko.observableArray();
+        self.LinesOrderExtTotal = ko.observable();
+        self.OrderTotal = ko.observable();
+    };
+    var viewModelLines = new linesViewModel();
+    function createLinesKO(lines, linesOrderExtTotal, orderTotal)
+    {
+        viewModelLines.Lines = ko.mapping.fromJS(lines);
+        viewModelLines.LinesOrderExtTotal(linesOrderExtTotal);
+        viewModelLines.OrderTotal(orderTotal); 
+
+        if (lines != null && lines.length > 0)
+            ko.applyBindings(viewModelLines, document.getElementById("divLines"));
+    }
+</script>

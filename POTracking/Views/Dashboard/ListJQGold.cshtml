@@ -1,0 +1,436 @@
+﻿@*model PagedList<POT.DAL.vw_PO_Dashboard>*@
+@using HSG.Helper;
+@{ ViewBag.Title = "JQGrid Dashboard"; Layout = Defaults.masterLayout;}
+@{ string gridData = ViewBag.gridData ?? ""; }
+@section HeadContent
+{
+    <script src="@Url.Content("~/Content/JQG/ui.multiselect.js")"></script>
+    @* Gives error anddoesn't work! <script src="@Url.Content("~/Content/JQG/jqg.columnSelecter.js")"></script>  // must be after jqGrid *@
+    <script src="@Url.Content("~/Content/JQG/jquery.jqgrid.src-4.9.2.js")"></script>
+    <script src="@Url.Content("~/Content/JQG/grid.locale-en-4.9.2.js")"></script>
+
+
+    <link href="@Url.Content("~/Content/JQG/css/ui.jqgrid-4.9.2.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/JQG/css/ui.multiselect.css")" rel="stylesheet" type="text/css" />
+}
+<table>
+    <tr>
+        <td>
+            <input id="chkSubGrid" type="checkbox" onchange="toggleSubGrid(this)" title="Show Comments. NOTE: Works only when no columns are frozen." /></td>
+        <td>Toggle Comments subgrid</td>        
+        <td>
+            <input id="chkGridHdr" type="checkbox" onchange="toggleGridHeaders(this)" title="Shows grouped headers. NOTE: Column reordering will NOT work!" /></td>
+        <td>&nbsp;Toggle Group Headers</td>        
+        <td>
+            <input id="chkFrozenCol" type="checkbox" onchange="toggleFrozenCol(this)" /></td>
+        <td>&nbsp;Toggle frozen column (i.e. POno)&nbsp;&nbsp;</td>
+        <td>&nbsp Grouping : </td>
+        <td>
+            <select id="ddlGroupBy" onchange="groupJQGBy(this)">
+                <option value="">No Grouping</option>
+                <option value="POdt">PO Date</option>
+                <option value="Status">Status</option>
+                <option value="Brand">Brand</option>
+                <option value="Vndr">Vendor</option>
+                <option value="Ship">Ship To</option>
+            </select>
+        </td>        
+    </tr>
+</table>
+<table id="tblJQGrid"></table>
+<div id="pagerTBL"></div>
+<img src="@Url.Content("~/Content/Images/spacer.gif")" height="1px" width="900px" />
+<script type="text/javascript" defer="defer">
+    var autocompleteURL = "@Defaults.commonRoot/Lookup?id=";
+    var dashboardURL = '@Url.Content("~/Dashboard/")';
+    var ListURL = "@Html.Raw(@Url.Action("POListjqg", "Dashboard"))";
+    var gridTBLid = "tblJQGrid", pagerTBLid = "#pagerTBL";
+    var tblJQGrid = $('#' + gridTBLid), pagerTBL = $(pagerTBLid);
+    var chkSubGrid = $("#chkSubGrid");
+                    var chkGridHdr = $("#chkGridHdr");
+                    var chkFrozenCol = $("#chkFrozenCol");
+
+                    var ddlGroupBy = $("#ddlGroupBy");
+
+                    $(document).ready(function ()
+                    {
+                        initJQGrid();
+                        extendGridFeatures();
+                        initColumnChooser();
+
+                        // http://www.trirand.com/jqgridwiki/doku.php?id=wiki:import_methods
+                        @if(gridData.Length > 0)
+                        {
+                            @Html.Raw("tblJQGrid.jqGrid('jqGridImport', {'imptype': 'xmlstring', 'impstring':'" + gridData + "'});");
+                        }
+                    });
+
+                        function initJQGrid() {
+                            var gridHeight = ($(window).height() - 240);
+                            //var tblJQGrid = jQuery('#' + gridTBLid);
+                            var lastsel;
+
+        @* ------ START :  jqGrid init ------ *@
+        tblJQGrid.jqGrid({
+            url: ListURL,
+            datatype: 'json',
+            height: gridHeight,
+            width: ($('#' + gridTBLid).parent().width()), // to have horizontal scroll bar for frozen columns.
+            colNames: ['ID', 'PO #', 'PO Date', 'Status', 'Brand', 'Vendor', 'Ship To', 'ETA', 'ETD'],
+            colModel: [
+                { name: 'ID', index: 'ID', width: 55, editrules: { required: true, edithidden: true }, hidden: true, frozen: true }, // hidden col SO : 1661800
+                {
+                    name: 'POno', index: 'POno', width: 55, frozen: true,
+                    formatter: 'showlink', formatoptions: { baseLinkUrl: 'javascript:', showAction: "gotoPO('", addParam: "');" }
+                    , summaryType: 'count'
+                },
+                {
+                    name: 'POdt', index: 'POdt', width: 90, editable: true,
+                    formatter: 'date',
+                    formatoptions: { srcformat: 'm/d/Y', newformat: 'm/d/Y' }, @* required to parse 'mm/dd/yy' date string, also see SO : 12455337 *@
+                    //datefmt: 'd-M-Y', // SO : 19762610
+                    sortable: true, sorttype: 'date',
+                    edittype: "text",
+                    editoptions: { // dataInit is the client-side event that fires upon initializing the toolbar search field for a column
+                        // use it to place a third party control to customize the toolbar
+                        dataInit: function (element) {
+                            $(element).datepicker({
+                                id: 'orderDate_datePicker',
+                                dateFormat: 'M/d/yy',
+                                minDate: new Date(1753, 1, 1),
+                                maxDate: new Date(9999, 12, 31),
+                                showOn: 'focus'
+                            });
+                        }
+                    }
+                },
+                {
+                    name: 'Status', index: 'Status', width: 112, align: "center", editable: true, formatter: 'select', edittype: 'select',
+                    editoptions: { value: "null:null;24:Credit Approved;14:Placed with factory;19:On Hold;18:Revision Required;15:Waiting for Production;16:In Production;20:Booked;21:Shipped;25:In Transit;23:Completed;22:Cancelled" }
+                },
+                { name: 'Brand', index: 'Brand', width: 150, editable: true },
+                { name: 'Vndr', index: 'Vndr', width: 350, editable: true },
+                { name: 'Ship', index: 'Ship', width: 100, editable: true },
+                {
+                    name: 'ETA', index: 'ETA', width: 80, align: "center", editable: true, sortable: true,
+                    sorttype: 'date', formatter: 'date', formatoptions: { srcformat: 'm/d/Y', newformat: 'm/d/Y' }
+                },
+                {
+                    name: 'ETD', index: 'ETD', width: 80, align: "center", editable: true, sortable: true,
+                    sorttype: 'date', formatter: 'date', formatoptions: { srcformat: 'm/d/Y', newformat: 'm/d/Y' }
+                }
+            ],
+            gridview: true, // CAUTION: NOT for Treeview, Subgrid or afterInsertRow -  IMP : to improve grid performance by rendering whole row at once
+            //pager: '#' + GridId + 'Pager',
+            sortname: "PONumber", //default sorted column
+            @* Also view SO : 8292341 for hrz scroll *@
+            autoWidth: false, // for horizontal scrollbar SO : 16876182
+            shrinkToFit: false, //DON'T use while freezing columns
+            forceFit: true, // not too effective if we've hrz scroll
+
+            viewrecords: true,//data.viewrecords,
+            ignoreCase: true, // make local search \ sort case-insensitive
+            navigator: true,   // for keys navigation in grid
+            loadonce: true,   // single call to server for grid 
+            caption: "POT Dashboard jqGrid demo",
+            pager: pagerTBLid,
+            //paging: false,
+            editable: true,
+            //pgtext: "",
+            //pginput: false,
+            //hidegrid: false,
+            //pgbuttons: false,
+            //toppager: true,
+            rowList: [10, 20, 30, 50, 100, 'All'],
+            rowNum: 100, // give -1 if need to show all the rows
+            rownumbers: true,
+            //editurl: GridEditUrl,
+            viewrecords: true,
+            @* // http://www.trirand.com/jqgridwiki/doku.php?id=wiki:grouping
+            Sends request to - http://localhost:1573/Dashboard/POListjqg?_search=false&nd=1449916232809&rows=100&page=1&sidx=Brand+asc%2C+PONumber&sord=asc
+            *@
+            loadComplete: function (data) { /* SO : 1237096 */
+                $(".ui-pg-selbox option[value='All']").val(data.length);
+            },
+            @* Uncomment to enable grid grouping
+            grouping: true,
+            groupingView: {
+                groupField: ['Brand'],
+                groupDataSorted: true,
+                groupSummary: [true],
+                groupColumnShow: [false],
+               // groupText: ['({1})'],
+                showSummaryOnHide: true,                
+                groupCollapse: true
+            },
+            
+            caption: "Brand Grouping"
+            *@
+
+            subGrid: true,
+            caption: "Comments",
+            @* only for xml data -
+            subGridUrl: 'Commentsjqg',
+            subGridModel: [{
+                name: ['CommentBy', 'Comment1', 'PostedOn'],
+                width: [100, 200, 100],
+                params : ['ID']
+            }
+            ],*@
+            subGridRowExpanded: function (subgridDivId, rowId) { /* SO : 26409119*/
+                var rowData = tblJQGrid.getRowData(rowId);
+                var selPONo = rowData['ID'];
+                var $subgrid = $("<table id='" + subgridDivId + "_t'></table>");
+                /*  pureRowId = $.jgrid.stripPref(mainGridPrefix, rowId),
+                    subgrids = $(this).jqGrid("getGridParam", "userData"); */
+
+                $subgrid.appendTo("#" + $.jgrid.jqID(subgridDivId));
+                $subgrid.jqGrid({
+                    datatype: "json",
+                    mtype: 'GET',
+                    url: 'Commentsjqg?POID=' + selPONo,
+                    colNames: ['Comment By', 'Comment', 'Posted On'],
+                    colModel: [
+                        { name: 'CommentBy', width: 150 }, { name: "Comment1", width: 450 },
+                        {
+                            name: "PostedOn", width: 80, sorttype: 'date',
+                            formatter: 'date', formatoptions: { newformat: 'm/d/Y' }
+                        }
+                    ],
+                    @*jsonReader: {
+                        //root: "records",
+                        repeatitems: true
+                    },*@
+                    height: "100%",
+                    rowNum: 10,
+                    @*autowidth: true,*@
+                    gridview: true,
+                    idPrefix: rowId + "_"
+                });
+            }
+
+            @*onSelectRow: function (id) {
+                if (id && id !== lastsel)
+                {
+                    tblJQGrid.jqGrid('restoreRow', lastsel);
+                    tblJQGrid.jqGrid('editRow', id, true); lastsel = id;
+                }
+            }*@
+        });
+
+        @* ------ END :  jqGrid init ------ *@
+    }
+
+    function extendGridFeatures() {
+
+        @* ------ START : navGrid ------ *@
+        tblJQGrid.jqGrid('navGrid', pagerTBLid,
+            { edit: true, add: true, del: true }, @* options *@
+            { height: 280, reloadAfterSubmit: false }, @* edit options *@
+            { height: 280, reloadAfterSubmit: false }, @* add options *@
+            { reloadAfterSubmit: false }, @* del options *@
+            {
+                closeOnEscape: true, multipleSearch: true, @* http://www.trirand.com/jqgridwiki/doku.php?id=wiki:advanced_searching *@
+                closeAfterSearch: true
+            } @* search options *@
+            );
+        @* ------ END : navGrid ------ *@
+
+        tblJQGrid.jqGrid('inlineNav', pagerTBLid);
+
+        @* -- START :  Bind the navigation and set the onEnter event -- *@
+        tblJQGrid.jqGrid('bindKeys', {
+            "onEnter": function (id) {
+                if (id && id !== lastsel) {
+                    tblJQGrid.jqGrid('restoreRow', lastsel);
+                    tblJQGrid.jqGrid('editRow', id, true); lastsel = id;
+                }
+            }
+        });
+        @* ------ END : bindkeys------ *@
+
+        @* SO : 8106655 (vertical scroll issue) 
+        tblJQGrid.bind('keydown', function (e) {
+            if (e.keyCode == 38 || e.keyCode == 40) e.preventDefault();
+        }); *@
+                        
+        tblJQGrid.hideCol('subgrid'); // hide so that headercheckbox can work as expected
+    }
+
+    function initColumnChooser()
+    {
+        /*@* SO : 10263025
+         Make sure that the group headers are not set while reordering columns *@ */
+
+        /*@* // SO : 18163713
+        // http://www.ok-soft-gmbh.com/jqGrid/SimpleLocalGridWithColumnChooser5__.htm *@ */
+        tblJQGrid.jqGrid('navGrid', pagerTBLid, { refreshstate: 'current', add: false, edit: false, del: false });
+        $.extend(true, $.ui.multiselect, {
+            locale: {
+                addAll: 'Make all visible',
+                removeAll: 'Hidde All',
+                itemsCount: 'Avlialble Columns'
+            }
+        });
+
+        $.extend(true, $.jgrid.col, {
+            width: 450,
+            modal: true,
+            msel_opts: { dividerLocation: 0.5 },
+            dialog_opts: {
+                minWidth: 470,
+                show: 'blind',
+                hide: 'explode'
+            }
+        });
+
+        tblJQGrid.jqGrid('navButtonAdd', pagerTBLid, {
+            caption: "",
+            buttonicon: "ui-icon-calculator",
+            title: "Choose columns",
+            onClickButton: function () {
+                $(this).jqGrid('columnChooser');
+                @* Remove grouped column headers *@
+                alert("Removing Grouped headers");
+                chkGridHdr.attr('checked', false).trigger("change"); @* But don't disable *@
+            }
+        });
+    }
+
+    function gotoPO(jqgID) {
+        var row = jqgID.split("=");
+        var row_ID = row[1];
+        var POID = tblJQGrid.getCell(row_ID, 'ID');
+        @* SO : 1368264 *@
+        window.location.href = window.location.protocol + "//" + window.location.host + "/PO/" + POID + "/Manage";
+    }
+
+    function toggleSubGrid(chk) {
+        if ($(chk).is(":checked")){
+            chkFrozenCol.attr('checked', false).trigger("change"); alert("Disabling frozen column");
+            
+            tblJQGrid.showCol('subgrid');
+            chkFrozenCol.attr("disabled", true);
+        }
+        else {
+            @*// Collapse each row - SO : 16463439 *@
+            var rowIds = tblJQGrid.getDataIDs();
+            $.each(rowIds, function (index, rowId) {
+                tblJQGrid.collapseSubGridRow(rowId);
+            });
+
+            tblJQGrid.hideCol('subgrid'); @* do observe conflict with frozen *@
+            chkFrozenCol.removeAttr("disabled");
+        }
+    }
+
+    function toggleFrozenCol(chk) {
+        @* Dynamic setup : http://www.trirand.com/jqgridwiki/doku.php?id=wiki:frozencolumns *@
+
+        if ($(chk).is(":checked")) {
+            chkSubGrid.attr('checked', false).trigger("change"); alert("Disabling subgrid");
+            
+            tblJQGrid.jqGrid("setGridParam", { subGrid: false }); @* observe conflict *@
+
+            tblJQGrid.jqGrid("destroyFrozenColumns")
+            .jqGrid("setColProp", "POno", { frozen: true })
+            .jqGrid("setFrozenColumns")
+            .trigger("reloadGrid", [{ current: true }]);
+
+            chkSubGrid.attr("disabled", true);
+        }
+        else {
+
+            tblJQGrid.jqGrid("setGridParam", { subGrid: true });
+
+            tblJQGrid.jqGrid('destroyFrozenColumns')
+                .trigger('reloadGrid', [{ current: true }]);
+
+            chkSubGrid.removeAttr("disabled");
+        }
+    }
+
+    function toggleGridHeaders(chk) {
+        @*// SO : 10263025
+         Make sure that the group headers are not set while reordering columns*@
+
+        if ($(chk).is(":checked")) {
+            
+            @* ------ START : Group Headers ------ *@
+            tblJQGrid.jqGrid('setGroupHeaders', { @* http://www.trirand.com/jqgridwiki/doku.php?id=wiki:groupingheadar *@
+                useColSpanStyle: true, @* to show non-grouped header *@
+                groupHeaders: [
+                  { startColumnName: 'POno', numberOfColumns: 4, titleText: '<b>PO Info</b>' },
+                  { startColumnName: 'Ship', numberOfColumns: 3, titleText: '<b>Shipping Details</b>' }
+                ]
+            });
+            @* ------ END : Group Headers------ *@
+
+        }
+        else {
+            tblJQGrid.jqGrid('destroyGroupHeader');
+        }
+    }
+
+    function resetPaging(reset) { @* SO : 4757198 *@
+
+        var selPGVal = reset ?
+            $("select.ui-pg-selbox option:contains('All')").val() : '100';
+
+        var ddl = $("select.ui-pg-selbox");
+
+        if (selPGVal != ddl.val()) {
+            ddl.val(selPGVal);
+            ddl.trigger("change");
+        }
+
+        @*//Or use $("select.ui-pg-selbox option").first() & last();
+        /* $("select.ui-pg-selbox option").each(function () {
+            if (reset && $(this).text() == "All") {
+                //opt = $(this);
+                $(this).attr('selected', true);
+            }
+            else 
+                $(this).removeAttr('selected'); // remove for all
+            
+        });*/ *@
+    }
+
+    function groupJQGBy(ddl) {
+
+        var groupingName = $(ddl).val();
+        showNOTY("Resetting paging", true);
+        if (groupingName != null && groupingName != "") {
+            //pagerTBL.hide();
+            // SO : 1237096
+            // HT : Doesn't work as expected
+            //tblJQGrid.jqGrid('setGridParam', 'rowNum', ''); // CAUTION : 100000 is not the max possible value
+
+            //tblJQGrid.jqGrid('groupingGroupBy', groupingName);
+            tblJQGrid.jqGrid('groupingGroupBy', groupingName, {
+                //    groupField : [groupingName],
+                groupOrder: ['asc'],
+                groupColumnShow: [true],
+                groupCollapse: true
+            });
+
+            // SO : 17322817
+            // HT : Doesn't work as expected
+            //tblJQGrid.setGridParam({ page: 1, datatype: "json" }).trigger('reloadGrid');
+
+            resetPaging(true);
+        }
+        else {
+            //pagerTBL.show();
+            @*
+            tblJQGrid.jqGrid('setGridParam', 'rowNum', 100);
+            // SO : 17322817
+            // HT : Doesn't work as expected
+            tblJQGrid.setGridParam({ page: 1, datatype: "json" }).trigger('reloadGrid');*@
+            tblJQGrid.jqGrid('groupingRemove');
+            resetPaging(false);
+        }
+    }    
+</script>
+
+<img src="@Url.Content("~/Content/Images/spacer.gif")" height="1px" width="800px" />

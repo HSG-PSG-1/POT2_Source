@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 21, 25.5" name="POTmodel">
+  <DataContextMoniker Name="/POTmodel" />
+  <nestedChildShapes>
+    <classShape Id="8dc5de72-fd76-44bb-9872-7a4e69c80103" absoluteBounds="0.75, 0.75, 2, 2.7324039713541666">
+      <DataClassMoniker Name="/POTmodel/ActivityHistory" />
+      <nestedChildShapes>
+        <elementListCompartment Id="0b5c64c7-63b0-4a9d-aba3-067e4da3683b" absoluteBounds="0.76500000000000057, 1.2100000000000009, 1.9700000000000002, 2.1724039713541665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="3d86d3bd-e22c-47d9-a89d-09cb2d46ca02" absoluteBounds="3.75, 0.75, 2, 1.9631982421875">
+      <DataClassMoniker Name="/POTmodel/ActivityType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="79d44d28-b921-4d25-b0ed-bcf6e1be1b05" absoluteBounds="3.7650000000000006, 1.2100000000000009, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="7d18234d-58ad-4f46-94b4-f9153493fba2" absoluteBounds="3.75, 3.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterBrand" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c096d9da-e8cf-4e84-8c55-b38cbd119672" absoluteBounds="3.765, 4.2100000000000009, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="c9490355-c03b-40e1-adca-616f786c7304" absoluteBounds="6.75, 0.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterCarrier" />
+      <nestedChildShapes>
+        <elementListCompartment Id="63214293-b7d8-4b2d-9b64-f5d66b44f874" absoluteBounds="6.765, 1.2100000000000009, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="55ec963b-1242-4100-908d-12451b351be7" absoluteBounds="0.75, 6.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterContainerType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ad6efd06-6ae3-4209-91a5-48e652fc6c0f" absoluteBounds="0.765, 7.21, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="f319d9ea-79ad-421f-b0f7-c196da127591" absoluteBounds="6.75, 3.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterFileType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="a04c7b16-a2c7-4ba0-85d5-16bbb37cb03c" absoluteBounds="6.765, 4.21, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="c2259864-03a9-416d-bbc0-602e2346af66" absoluteBounds="3.75, 6.75, 2, 2.3478011067708326">
+      <DataClassMoniker Name="/POTmodel/MasterItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="fe27c628-fa3d-4f38-bb39-2ea25affa740" absoluteBounds="3.7649999999999997, 7.2100000000000009, 1.9700000000000002, 1.7878011067708333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="03849488-cde3-403c-b924-e7ff835f8577" absoluteBounds="6.75, 6.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterOrderType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="8b74e3c1-5cb1-4558-96a7-64644d1eb094" absoluteBounds="6.765, 7.21, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="b70060dc-a3dc-4023-b35a-10ba571c54e9" absoluteBounds="9.75, 0.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterShipVia" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c1cbce8c-3ca3-43f1-baa9-225ac3f8f167" absoluteBounds="9.765, 1.2100000000000009, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="48a40a7c-c832-45fb-9592-4c95c037ce0d" absoluteBounds="9.75, 3.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterStatus" />
+      <nestedChildShapes>
+        <elementListCompartment Id="600e708c-c554-4d84-a867-2b1a2745d266" absoluteBounds="9.765, 4.2100000000000009, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="39e16b13-e3d7-4382-80b7-1360352f870f" absoluteBounds="9.75, 6.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterTerm" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1ea63a7b-1c6e-4732-9cfa-ea0bee3adf9b" absoluteBounds="9.765, 7.2100000000000009, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="435c26a4-a548-484f-8624-d73ab866f1af" absoluteBounds="6.75, 9.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/MasterWarehouse" />
+      <nestedChildShapes>
+        <elementListCompartment Id="82beb087-fe3e-4ccd-8243-e6f5e8aa1acf" absoluteBounds="6.765, 10.21, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="72555459-3999-4077-b1fc-256120be58d4" absoluteBounds="9.75, 9.75, 2, 1.9631982421875005">
+      <DataClassMoniker Name="/POTmodel/Organization" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c6f87f56-960f-4d5e-94c3-dfe89fcf81c6" absoluteBounds="9.765, 10.21, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="124b1f4a-a580-4fe1-acba-d3c5c3e2859f" absoluteBounds="0.75, 10.75, 2, 1.7708968098958344">
+      <DataClassMoniker Name="/POTmodel/OrgType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1a1145ef-8a7e-4b98-a890-e10e0353a89a" absoluteBounds="0.76500000000000057, 11.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="624b47d5-234c-4921-a812-5e529686ff11" absoluteBounds="12.75, 0.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/POComment" />
+      <nestedChildShapes>
+        <elementListCompartment Id="120e1364-41ee-4012-a068-d23a66f23dac" absoluteBounds="12.765, 1.2100000000000009, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="c9986b09-9ca7-4757-bdd7-7f87825e36a9" absoluteBounds="12.75, 3.75, 2, 5.8092268880208326">
+      <DataClassMoniker Name="/POTmodel/PODetail" />
+      <nestedChildShapes>
+        <elementListCompartment Id="600180c2-be53-4b08-b1e8-434920ab4743" absoluteBounds="12.765, 4.21, 1.9700000000000002, 5.249226888020833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="74bcfc5d-66d2-4b3d-87e9-073e8dcd23a1" absoluteBounds="3.75, 12.75, 2, 2.5401025390625005">
+      <DataClassMoniker Name="/POTmodel/POFile" />
+      <nestedChildShapes>
+        <elementListCompartment Id="2efc2418-5b0f-4790-867e-c887c7ca364a" absoluteBounds="3.7650000000000006, 13.21, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="e4217577-8e57-49d9-b0b8-cce40f9013f2" absoluteBounds="6.75, 12.75, 2, 12.539777018229167">
+      <DataClassMoniker Name="/POTmodel/POHeader" />
+      <nestedChildShapes>
+        <elementListCompartment Id="3f593051-ccb9-4833-bc94-7a1ddbcb50ef" absoluteBounds="6.7650000000000006, 13.21, 1.9700000000000002, 11.979777018229166" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="903f8c85-edef-48ef-aa99-b6a9dadf94a3" absoluteBounds="9.75, 12.75, 2, 1.9631982421875005">
+      <DataClassMoniker Name="/POTmodel/POStatusHistory" />
+      <nestedChildShapes>
+        <elementListCompartment Id="24eade78-58ac-4fe6-9928-dad9da0561a9" absoluteBounds="9.765, 13.21, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="300d53b9-b90a-4dc3-82b1-5be1ad33b1ef" absoluteBounds="12.75, 10.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/POTmodel/Setting" />
+      <nestedChildShapes>
+        <elementListCompartment Id="22a40132-efb1-421f-9e1a-6b521c54f90b" absoluteBounds="12.765, 11.21, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="e59a27bd-efc3-424c-b337-79c2c3257e0d" absoluteBounds="12.75, 13.75, 2, 3.30930826822917">
+      <DataClassMoniker Name="/POTmodel/UserRole" />
+      <nestedChildShapes>
+        <elementListCompartment Id="fc634497-4bda-4d4c-bdae-ce0bdd71bf28" absoluteBounds="12.765, 14.21, 1.9700000000000002, 2.7493082682291665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="c36b1e91-0aa7-4861-9ef6-3bb40be3cebc" absoluteBounds="15.75, 0.75, 2, 2.3478011067708335">
+      <DataClassMoniker Name="/POTmodel/Users" />
+      <nestedChildShapes>
+        <elementListCompartment Id="eff5b1ec-17b7-4599-b8c2-da5707122da9" absoluteBounds="15.765, 1.21, 1.9700000000000002, 1.7878011067708333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="3958eeee-830e-4ee4-9178-523b075ce0d1" absoluteBounds="15.75, 4.75, 2, 3.3093082682291666">
+      <DataClassMoniker Name="/POTmodel/vw_Users_Role_Org" />
+      <nestedChildShapes>
+        <elementListCompartment Id="408beece-d02e-43cb-b55d-4eb7d6d8c19d" absoluteBounds="15.765, 5.2100000000000009, 1.9700000000000002, 2.7493082682291665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="e635425b-6de2-49f4-b40a-b2fdb74d7879" absoluteBounds="15.75, 9.75, 2, 2.5401025390625005">
+      <DataClassMoniker Name="/POTmodel/vw_StatusHistory_Usr" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1df3d67e-f8dd-4e2f-bba3-0268b67833e2" absoluteBounds="15.765, 10.21, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="bdb4e531-33b4-45ce-b768-d4108a6ce8c8" absoluteBounds="15.75, 13.75, 2, 1.7708968098958344">
+      <DataClassMoniker Name="/POTmodel/vw_Org_Role" />
+      <nestedChildShapes>
+        <elementListCompartment Id="986f6b39-98b5-42db-8105-3f019b3fcda1" absoluteBounds="15.765, 14.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="10031afa-2407-4a85-aaf0-32e99523bd7b" absoluteBounds="0.75, 16.75, 2, 1.7708968098958344">
+      <DataClassMoniker Name="/POTmodel/vw_MasterOrg_Role" />
+      <nestedChildShapes>
+        <elementListCompartment Id="0af46d3e-a952-426b-857d-5915075cb7f8" absoluteBounds="0.76500000000000057, 17.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="93ee477e-80fa-4042-832f-6b18a8b45023" absoluteBounds="15.75, 16.75, 2, 2.73240397135417">
+      <DataClassMoniker Name="/POTmodel/vw_ActivityLog" />
+      <nestedChildShapes>
+        <elementListCompartment Id="39eaf941-d7af-4c28-8a80-e6d08b56aec0" absoluteBounds="15.765, 17.21, 1.9700000000000002, 2.1724039713541665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="a94ce1f8-837c-45e8-bcb9-28354cf10319" absoluteBounds="18.75, 0.75, 2, 4.2708154296875">
+      <DataClassMoniker Name="/POTmodel/vw_PO_Dashboard" />
+      <nestedChildShapes>
+        <elementListCompartment Id="301b74fc-9b7d-4d4d-bee1-368351db4b60" absoluteBounds="18.765, 1.2100000000000009, 1.9700000000000002, 3.7108154296875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="3bc3fb37-340c-44e2-8a97-ccdeb6bc0551" absoluteBounds="18.75, 6.75, 2, 9.6552555338541666">
+      <DataClassMoniker Name="/POTmodel/vw_POHeader" />
+      <nestedChildShapes>
+        <elementListCompartment Id="093fdcc6-dd95-41ab-9e86-9eb1e66b254b" absoluteBounds="18.765, 7.2100000000000009, 1.9700000000000002, 9.0952555338541661" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="abf9eb85-f902-4232-82e5-229001af2b22" absoluteBounds="9.75, 18.75, 2, 5.0400211588541666">
+      <DataClassMoniker Name="/POTmodel/vw_POLine" />
+      <nestedChildShapes>
+        <elementListCompartment Id="986971d3-e595-42b8-8fec-4cc84976d69c" absoluteBounds="9.765, 19.21, 1.9700000000000002, 4.4800211588541661" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

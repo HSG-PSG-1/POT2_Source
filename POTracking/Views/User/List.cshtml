@@ -1,0 +1,339 @@
+﻿@using System.Collections
+@using Webdiyer.WebControls.Mvc
+@using POT.Services
+@using HSG.Helper
+@{ ViewBag.Title = "User List"; Layout = Defaults.masterLayout; ViewBag.Err = UserService.delRefChkMsg; }
+@section HeadContent {
+    <script type="text/javascript">
+        var validator;
+        function setupValidation() {//http://docs.jquery.com/Plugins/Validation/validate#options
+            // validate signup form on keyup and submit
+            validator = $("#frmUsr").validate({
+                ignore: ".ignore"//set this class                
+                , onfocusout: function (element) { $(element).valid(); }  //SO: 8045731
+                , rules: {
+                    //Email: "required" or required: true, 
+                    Email: {
+                        remote: {
+                            url: '@Url.Action("Validate", "Common", new { src = "UserEmail" })', //, extras=Model.EmailOLD
+                            data: {
+                                term: function () {//Remove cached SO: 1564711
+                                    /*$("#Email").removeData("previousValue");HT:CAUTION - will prevent form submission!
+                                    https://github.com/jzaefferer/jquery-validation/issues/58*/
+                                    //FIX: SO: 7329125/jquery-validate-remote-is-failing-cant-submit-form
+                                    return $("#Email").val();
+                                },
+                                extras: function () { return oldEmail;@*$("#EmailOLD").val();*@ }
+                            }
+                        }
+                    }
+                }
+            , messages: { Email: { remote: "Duplicate email found" }/*, OrgName: "This field is required."*/ }
+                // the errorPlacement has to take the table layout into account 
+                , errorPlacement: function (error, element) {
+                    if (element.is(":radio")) error.appendTo(element.parent().next().next());
+                    else if (element.is(":checkbox")) error.appendTo(element.next());
+                    else error.appendTo(element.parent()); //.next()
+                }
+                //MORE for future: http://docs.jquery.com/Plugins/Validation/validate#options
+                //, invalidHandler: function(form, validator) { alert(validator.numberOfInvalids()); }
+                , @Defaults.validatorJQsetting
+            });
+
+            }
+    </script>
+    <style>
+        select, input[type="text"], input[type="password"]
+        {
+            width: 250px;
+        }
+    </style>
+}
+@{ POT.DAL.vw_Users_Role_Org usrSearch = ((POT.DAL.vw_Users_Role_Org)(ViewData["SearchData"]));
+   object routeValues = new { qData = Request["qData"] };   
+}
+<table width="100%" border="0">
+    <tr>
+        <td class="sqz" valign="top">
+            <b class="smallHeading">Manage User</b><br />
+            &nbsp;
+        </td>
+        <td align="center" style="width: 98%">
+            <span id="msg">@Html.ValidationSummary(true)<br />
+                <br />
+                @* @if (oprSuccess.HasValue) { @Html.Raw(Defaults.getOprResult(oprSuccess.Value, UserService.delRefChkMsg))} *@
+            </span>
+        </td>
+        <td class="sqz" align="right" valign="top">
+            @* Quick search: <input type="text" class="textBox" data-bind = "value:quickSearch" title="all filters except Date. Also searches Organization Name" /> *@
+        </td>
+        <td class="sqz" align="right" valign="bottom">
+            <a href="#" data-bind="click:$data.addNew">Create New</a>&nbsp;
+            @Html.Raw(string.Format(Defaults.tableNavImg,"  style='vertical-align:middle;'"))            
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <fieldset>
+                <legend onclick="showHideDiv('tblSearch')" style="cursor: pointer">&nbsp;<img id="tblSearchImg"
+                    src="@Url.Content("~/Content/Images/aroB.gif")" alt="Show/Hide panel" />
+                    &nbsp;Search&nbsp;</legend>
+                <div id="tblSearch">
+                    <form action="@Url.Content("~/Users/List")" method="post" id="frm" style="display: inline" onsubmit="return doAJAXSubmit(this);">
+                        <table id="tblSearch" cellpadding="2" cellspacing="2" border="0" width="100%">
+                            <tr>
+                                <td nowrap="nowrap" width="5%">Name
+                                </td>
+                                <td>@Html.TextBox("UserName", usrSearch.UserName, new { @class = "hdrTxt textBox", data_bind = "value:search.UserName", @autofocus = "autofocus" })
+                                </td>
+                                <td nowrap="nowrap" width="5%">Email
+                                </td>
+                                <td>@Html.TextBox("UsrEmail", usrSearch.Email, new { @class = "hdrTxt textBox", data_bind = "value:search.Email" })
+                                </td>
+                                <td nowrap="nowrap" width="5%">Role
+                                </td>
+                                <td nowrap="nowrap">@Html.DropDownList("RoleID", new SelectList((IEnumerable)ViewData["Roles"], "ID", "TEXT", usrSearch.RoleID),
+                 "All Roles", new { @class = "dropDown", data_bind = "value:search.RoleID" })
+                                </td>
+                                <td nowrap="nowrap" align="right" colspan="6">
+                                    <input type="submit" onclick="return doAJAXSubmit(this);" value="Search" class="button" />
+                                    &nbsp;
+                                <input type="submit" value="Reset" class="button" onclick="resetForm(this);" />
+                                    <input type="checkbox" name="doReset" id="doReset" style="display: none;" />
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </fieldset>
+            <!-- END: Search Panel -->
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <div id="tdGrid" data-bind1="visible : showGrid">
+                @{ Html.RenderPartial("KO/UserList",
+                           new ViewDataDictionary { { "gridPageSize", ViewData["gridPageSize"] } }); }
+            </div>
+        </td>
+    </tr>
+</table>
+<div id="usrAddEditDialog" data-bind="if: editRecord() != null && editRecord().length > 0" title="Edit User" style="padding: 0px 0px 0px 0px;">
+    <form id="frmUsr" name="frmUsr" action="@Url.Action("AddEdit")" method="post" 
+    onsubmit1="if($(this).valid())$('#btnSubmit').prop('disabled', true); return false;">
+        <table align="center" data-bind="with: editRecord()[0]" width="100%" style="padding: 0px 0px 0px 0px;" id="tblUsrAddEdit">
+            <tr>
+                <td>
+                    <table border="0" cellpadding="4" cellspacing="4" width="100%" align="center">
+                        <thead class="header">
+                            <th colspan="2" align="center">
+                                <b class="smallHeading"><span data-bind="html: $parent.opr()"></span>&nbsp;User Details</b>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="2">
+                                    <div id="errors">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bold" width="30%" align="right">Name :&nbsp;
+                                </td>
+                                <td width="70%">
+                                    <input class="required" id="Name" maxlength="50" name="Name" type="text" data-bind="value:UserName" />&nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bold" align="right">Role :&nbsp;
+                                </td>
+                                <td>
+                                    <select id="ddlRoles" class="dropDown required" data-bind="options: $parent.roles, value:RoleID, optionsText: 'TEXT', optionsValue:'ID'"
+                                        onchange="fillOrgs(true);">
+                                    </select>
+                                    <input class="ignore" id="OrgTypeId" name="OrgTypeId" type="hidden" data-bind="value:OrgTypeId" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bold" align="right">Organization :&nbsp;
+                                </td>
+                                <td nowrap="nowrap">
+                                    <input class="required" id="OrgName" name="OrgName" style="width: 250px" type="text"
+                                        data-bind="value:OrgName" />&nbsp;&nbsp;@Html.Raw(string.Format(Defaults.lookupImgBtn, "OrgName"))
+                                    <input id="OrgID" name="OrgID" type="text" data-bind="value:OrgID" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bold" align="right">Email :&nbsp;
+                                </td>
+                                <td nowrap="nowrap">
+                                    <input class="email required" id="Email" maxlength="80" name="Email" type="text" data-bind="value:Email" />&nbsp;@* Can't keep EmailOld because KO will update both! *@
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bold" align="right">Password :&nbsp;
+                                </td>
+                                <td>
+                                    <input class="required" id="Password" maxlength="20" name="Password" type="text"
+                                        data-bind="value:Password" />&nbsp;
+                                </td>
+                            </tr>
+                            <!-- ko if: $parent.opr() == "Edit" -->
+                            <tr>
+                                <td colspan="2" nowrap="nowrap" align="center">
+                                    <i>Last Modified By : <span data-bind="html:LastModifiedByName"></span>&nbsp;
+                                (<span data-bind="html:LastModifiedDateTxt"></span>) </i>
+                                    <br />
+                                    <img src="@Url.Content("~/Content/Images/spacer.gif")" height="1px" width="600px" />
+                                </td>
+                            </tr>
+                            <!-- /ko -->
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <input id="btnSubmit" type="button" data-bind="click:$parent.saveEdit" value="Save"
+                                        class="button" />
+                                    <input id="btnReset" data-bind="click:$parent.cancelEdit" type="reset" value="Cancel"
+                                        class="button" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script type="text/javascript" id="mailToCellTemplate">
+    var mailToCellTemplate =
+'<u><a data-bind="attr:{href:\'javascript:MailTo(\' + \'\\\'\' + $parent.entity[\'Email\'] + \'\\\'\' + \')\'}, text: $parent.entity[\'Email\']"></a></u>';
+</script>
+<script type="text/javascript">
+
+    function doAJAXSubmit(frm) {
+        vm_U.invokeSearch(1);
+        return false;
+    }
+
+    function doAJAXSubmit(frm) {
+        vm_U.invokeSearch(1);
+        return false;
+    }
+    var userListModel = function () {
+        var self = this;
+        self.AllUsers = ko.observableArray(); // Initial items        
+        self.removeSelected = function (user) {
+            if (user != null) // Prevent blanks and duplicates
+                self.AllUsers.remove(user);
+        };
+    };
+
+    var vm_U = new vmUser();
+    var ListURL = '@Html.Raw(Url.Action("UsersKOVM", "User"))'; @*POUserList*@
+    function createKO() {
+        showDlg(true);
+        $.getJSON(ListURL, function (data) {
+            showDlg(false);
+            //vm_U.POs = ko.observableArray(data); // Initial items
+            vm_U.AllUsers = ko.mapping.fromJS(data.AllUsers);
+            vm_U.search = ko.mapping.fromJS(data.Search); // Otherwise the search button will be needed            
+            vm_U.newRecord = ko.observable(data.NewRecord);//ko.mapping.fromJS();
+            vm_U.roles(data.Roles);
+
+            vm_U.invokeSearch(2);
+
+            ko.applyBindings(vm_U);
+            //pagedGrid.DisplayFields(data);
+        });
+
+        //reset the function to handle callback
+        doFurtherProcessing = function () {
+            if (usrIDToDel == null) return;
+
+            var match = ko.utils.arrayFirst(vm_U.AllUsers(), function (usr) { return usrIDToDel == usr.ID; });
+            if (match != null)
+                vm_U.AllUsers.remove(match);
+
+            usrIDToDel = null;
+        }
+    }
+
+    var MailTo = function (data) {
+        alert("Send mail to : " + data);
+        //Try this while using external KO template: https://groups.google.com/forum/#!msg/knockoutjs/1WDUJNd-VQ0/SBVuJttE91UJ
+    }
+
+    var skipCommitChk = false;
+    var DataURL = '@Html.Raw(Url.Action("SetSearchOpts", "User"))'; @*POUserList*@
+    $().ready(function () {
+        $("#tblSearch").tableNav();        
+        @*//bind event to check po commit*@
+        window.onbeforeunload = function (e) {
+            if (skipCommitChk) { skipCommitChk = false; return; }
+            $.ajax({
+                type: "POST",
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "json",
+                data: ko.mapping.toJS(vm_U.search),// $("#frm").serialize(),
+                url: DataURL
+            , async: false // SO: 14645011 (for FF to ensure the postback is not            
+            });
+        };
+
+        $("#usrAddEditDialog").dialog({
+            modal: true,
+            autoOpen: false,
+            height: 270,
+            width: 620,
+            open: function (event, ui) {
+                if (validator == null) { } setupValidation(); fillOrgs(false);
+                $(".ui-dialog-titlebar-close").hide(); /* SO: 896777, 12901102 */
+                $(".ui-dialog-titlebar").hide();
+                $("#tblUsrAddEdit").tableNav();
+            }, @* called after focus - when the frmUsr is available *@
+            close: function (event, ui) { vm_U.showGrid(true); },
+            closeOnEscape: false
+        });//.dialog("widget").find(".ui-dialog-title").hide();​
+        // SO: 13283108
+
+        createKO();
+    });
+
+    function resetForm(btn) 
+    {
+        clearForm(document.getElementById('frm'));
+        document.getElementById('doReset').checked = true;
+        resetDatepicker('#PODateFrom1, #PODateTo1');
+
+        //trigger changePOStatusPost for KO binding notification
+        vm_U.search.Email(null);
+        vm_U.search.RoleID(0);
+        vm_U.search.RoleName(null);
+        vm_U.search.UserName(null);
+        vm_U.search.OrgType(null);
+    }
+
+    function checkReq1(ctrl, impactCtrl) { if (!(ctrl.value.length > 0)) $("#" + impactCtrl).val(''); }
+
+    function fillOrgs(reset) {
+        var ddl = document.getElementById("ddlRoles"); //RoleID
+        var pos = (ddl.selectedIndex > 0) ? ddl.selectedIndex : 0;
+        doOrgsDDL(ddl.options[pos].value, reset); //refresh Orgs dll
+        //showSalesperson();//show or hide sp row
+    }
+
+    function doOrgsDDL(RoleId, reset) {
+        if (reset) { $("#OrgID").val(''); $("#OrgName").val('');@* DON'T -  .change("trigger");*@ }
+        var urlPath = "@Defaults.commonRoot/Lookup?id=@LookupService.Source.Org.ToString()" +
+            "&extras=" + RoleId;
+        var idBox = "#OrgID", txtBox = "#OrgName";
+        renderAutoComplete(urlPath, idBox, txtBox); //refresh the autocomplete
+        //Need to have a custom select
+        $(txtBox).bind("autocompleteselect", function (event, ui) {
+            //set value if a valid item is selected
+            if (ui.item.id == null) { event.preventDefault(); }
+            else log(ui.item, idBox, txtBox); $("#OrgTypeId").val(ui.item.OrgTypeId).trigger("change");
+        });
+
+        //showHideLocations(false);//Disable Locations tab until a valid Customer ORg is selected
+    }
+</script>

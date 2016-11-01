@@ -1,0 +1,693 @@
+﻿@*model PagedList<POT.DAL.vw_PO_Dashboard>*@
+@using HSG.Helper;
+@{ ViewBag.Title = "JQGrid Dashboard"; Layout = Defaults.masterLayout;}
+@{ string gridData = ViewBag.gridData ?? ""; }
+@section HeadContent
+{
+    <script src="@Url.Content("~/Content/JQG/ui.multiselect.js")"></script>
+    @* Gives error anddoesn't work! <script src="@Url.Content("~/Content/JQG/jqg.columnSelecter.js")"></script>  // must be after jqGrid *@
+    <script src="@Url.Content("~/Content/JQG/jquery.jqgrid.src-4.9.2.js")"></script>
+    <script src="@Url.Content("~/Content/JQG/grid.locale-en-4.9.2.js")"></script>
+
+
+    <link href="@Url.Content("~/Content/JQG/css/ui.jqgrid-4.9.2.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/JQG/css/ui.multiselect.css")" rel="stylesheet" type="text/css" />
+}
+<table>
+    <tr>
+        <td>
+            <input id="chkSubGrid" type="checkbox" onchange="toggleSubGrid(this)" title="Show Comments. NOTE: Works only when no columns are frozen." />
+        </td>
+        <td>Toggle Comments subgrid</td>
+        <td>
+            <input id="chkGridHdr" type="checkbox" onchange="toggleGridHeaders(this)" title="Shows grouped headers. NOTE: Column reordering will NOT work!" />
+        </td>
+        <td>&nbsp;Toggle Group Headers</td>
+        <td>
+            <input id="chkFrozenCol" type="checkbox" onchange="toggleFrozenCol(this)" />
+        </td>
+        <td>&nbsp;Toggle frozen column (i.e. POno)&nbsp;&nbsp;</td>
+        <td>&nbsp Grouping : </td>
+        <td>
+            <select id="ddlGroupBy" onchange="groupJQGBy(this)">
+                <option value="">No Grouping</option>
+                <option value="POdt">PO Date</option>
+                <option value="Status">Status</option>
+                <option value="Brand">Brand</option>
+                <option value="Vndr">Vendor</option>
+                <option value="Ship">Ship To</option>
+            </select>
+        </td>
+        <td>
+            <form method="post" action="ExportGridConfig" id="frmConfExp" name="frmConfExp">
+                <input id="btnExpConf" type="submit" value="Test Config Export" onclick="ExportGridConfig();" />
+                <input id="txtGridConf" name="txtGridConf" type="hidden" value="@gridData" />
+            </form>
+        </td>
+    </tr>
+</table>
+<table id="tblJQGrid"></table>
+<div id="pagerTBL"></div>
+<img src="@Url.Content("~/Content/Images/spacer.gif")" height="1px" width="900px" />
+<script type="text/javascript" defer="defer">
+    var autocompleteURL = "@Defaults.commonRoot/Lookup?id=";
+    var dashboardURL = '@Url.Content("~/Dashboard/")';
+
+    var ListURL = "@Html.Raw(@Url.Action("POListjqg", "Dashboard"))";
+    var gridTBLid = "tblJQGrid", pagerTBLid = "#pagerTBL";
+    var tblJQGrid = $('#' + gridTBLid), pagerTBL = $(pagerTBLid);
+    var chkSubGrid = $("#chkSubGrid");
+    var chkGridHdr = $("#chkGridHdr");
+    var chkFrozenCol = $("#chkFrozenCol");
+
+    var ddlGroupBy = $("#ddlGroupBy");
+
+    var cm = [
+                { name: 'ID', index: 'ID', width: 55, editrules: { required: true, edithidden: true }, hidden: true, frozen: true }, // hidden col SO : 1661800
+                {
+                    name: 'POno', index: 'POno', width: 55, frozen: true,
+                    formatter: 'showlink', formatoptions: { baseLinkUrl: 'javascript:', showAction: "gotoPO('", addParam: "');" }
+                    , summaryType: 'count'
+                },
+                {
+                    name: 'POdt', index: 'POdt', width: 90, editable: true,
+                    formatter: 'date',
+                    formatoptions: { srcformat: 'm/d/Y', newformat: 'm/d/Y' }, @* required to parse 'mm/dd/yy' date string, also see SO : 12455337 *@
+                    //datefmt: 'd-M-Y', // SO : 19762610
+                    sortable: true, sorttype: 'date',
+                    edittype: "text",
+                    editoptions: { // dataInit is the client-side event that fires upon initializing the toolbar search field for a column
+                        // use it to place a third party control to customize the toolbar
+                        dataInit: function (element) {
+                            $(element).datepicker({
+                                id: 'orderDate_datePicker',
+                                dateFormat: 'M/d/yy',
+                                minDate: new Date(1753, 1, 1),
+                                maxDate: new Date(9999, 12, 31),
+                                showOn: 'focus'
+                            });
+                        }
+                    }
+                },
+                {
+                    name: 'Status', index: 'Status', width: 112, align: "center", editable: true, formatter: 'select', edittype: 'select',
+                    editoptions: { value: "null:null;24:Credit Approved;14:Placed with factory;19:On Hold;18:Revision Required;15:Waiting for Production;16:In Production;20:Booked;21:Shipped;25:In Transit;23:Completed;22:Cancelled" }
+                },
+                { name: 'Brand', index: 'Brand', width: 150, editable: true },
+                { name: 'Vndr', index: 'Vndr', width: 350, editable: true },
+                { name: 'Ship', index: 'Ship', width: 100, editable: true },
+                {
+                    name: 'ETA', index: 'ETA', width: 80, align: "center", editable: true, sortable: true,
+                    sorttype: 'date', formatter: 'date', formatoptions: { srcformat: 'm/d/Y', newformat: 'm/d/Y' }
+                },
+                {
+                    name: 'ETD', index: 'ETD', width: 80, align: "center", editable: true, sortable: true,
+                    sorttype: 'date', formatter: 'date', formatoptions: { srcformat: 'm/d/Y', newformat: 'm/d/Y' }
+                }
+            ];
+
+    @* /* =========================  SO : 8545953 script to persist the jQGrid ========================= */ *@
+
+    var $grid = tblJQGrid,
+        myDefaultSearch = 'cn',
+        getColumnIndex = function (grid, columnIndex) {
+            var cm = $grid.jqGrid('getGridParam', 'colModel'), i, l = cm.length;
+            for (i = 0; i < l; i++) {
+                if ((cm[i].index || cm[i].name) === columnIndex) {
+                    return i; // return the colModel index
+                }
+            }
+            return -1;
+        },
+        refreshSerchingToolbar = function ($grid, myDefaultSearch) {
+            var postData = $grid.jqGrid('getGridParam', 'postData'), filters, i, l,
+                rules, rule, iCol, cm = $grid.jqGrid('getGridParam', 'colModel'),
+                cmi, control, tagName;
+
+            for (i = 0, l = cm.length; i < l; i++) {
+                control = $("#gs_" + $.jgrid.jqID(cm[i].name));
+                if (control.length > 0) {
+                    tagName = control[0].tagName.toUpperCase();
+                    if (tagName === "SELECT") { // && cmi.stype === "select"
+                        control.find("option[value='']")
+                            .attr('selected', 'selected');
+                    } else if (tagName === "INPUT") {
+                        control.val('');
+                    }
+                }
+            }
+
+            if (typeof (postData.filters) === "string" &&
+                    typeof ($grid[0].ftoolbar) === "boolean" && $grid[0].ftoolbar) {
+
+                filters = $.parseJSON(postData.filters);
+                if (filters && filters.groupOp === "AND" && typeof (filters.groups) === "undefined") {
+                    // only in case of advance searching without grouping we import filters in the
+                    // searching toolbar
+                    rules = filters.rules;
+                    for (i = 0, l = rules.length; i < l; i++) {
+                        rule = rules[i];
+                        iCol = getColumnIndex($grid, rule.field);
+                        if (iCol >= 0) {
+                            cmi = cm[iCol];
+                            control = $("#gs_" + $.jgrid.jqID(cmi.name));
+                            if (control.length > 0 &&
+                                    (((typeof (cmi.searchoptions) === "undefined" ||
+                                    typeof (cmi.searchoptions.sopt) === "undefined")
+                                    && rule.op === myDefaultSearch) ||
+                                      (typeof (cmi.searchoptions) === "object" &&
+                                          $.isArray(cmi.searchoptions.sopt) &&
+                                          cmi.searchoptions.sopt.length > 0 &&
+                                          cmi.searchoptions.sopt[0] === rule.op))) {
+                                tagName = control[0].tagName.toUpperCase();
+                                if (tagName === "SELECT") { // && cmi.stype === "select"
+                                    control.find("option[value='" + $.jgrid.jqID(rule.data) + "']")
+                                        .attr('selected', 'selected');
+                                } else if (tagName === "INPUT") {
+                                    control.val(rule.data);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        saveObjectInLocalStorage = function (storageItemName, object) {
+            if (typeof window.localStorage !== 'undefined') {
+                @* alert('STORE:' + JSON.stringify(object));*@
+                window.localStorage.setItem(storageItemName, JSON.stringify(object));
+            }
+        },
+        removeObjectFromLocalStorage = function (storageItemName) {
+            if (typeof window.localStorage !== 'undefined') {
+                window.localStorage.removeItem(storageItemName);
+            }
+        },
+        getObjectFromLocalStorage = function (storageItemName) {
+            if (typeof window.localStorage !== 'undefined') {
+                return JSON.parse(window.localStorage.getItem(storageItemName));
+            }
+        },
+        myColumnStateName = 'ColumnChooserAndLocalStorage2.colState',
+        idsOfSelectedRows = [],
+        saveColumnState = function (perm) {
+            var colModel = this.jqGrid('getGridParam', 'colModel'), i, l = colModel.length, colItem, cmName,
+                postData = this.jqGrid('getGridParam', 'postData'),
+                columnsState = {
+                    search: this.jqGrid('getGridParam', 'search'),
+                    page: this.jqGrid('getGridParam', 'page'),
+                    sortname: this.jqGrid('getGridParam', 'sortname'),
+                    sortorder: this.jqGrid('getGridParam', 'sortorder'),
+                    permutation: perm,
+                    selectedRows: idsOfSelectedRows,
+                    colStates: {}
+                },
+                colStates = columnsState.colStates;
+
+            if (typeof (postData.filters) !== 'undefined') {
+                columnsState.filters = postData.filters;
+            }
+
+            for (i = 0; i < l; i++) {
+                colItem = colModel[i];
+                cmName = colItem.name;
+                if (cmName !== 'rn' && cmName !== 'cb' && cmName !== 'subgrid') {
+                    colStates[cmName] = {
+                        width: colItem.width,
+                        hidden: colItem.hidden
+                    };
+                }
+            }
+            saveObjectInLocalStorage(myColumnStateName, columnsState);
+        },
+        myColumnsState,
+        isColState,
+        restoreColumnState = function (colModel) {
+            var colItem, i, l = colModel.length, colStates, cmName,
+                columnsState = getObjectFromLocalStorage(myColumnStateName);
+
+            if (columnsState) {
+                colStates = columnsState.colStates;
+                for (i = 0; i < l; i++) {
+                    colItem = colModel[i];
+                    cmName = colItem.name;
+                    if (cmName !== 'rn' && cmName !== 'cb' && cmName !== 'subgrid') {
+                        colModel[i] = $.extend(true, {}, colModel[i], colStates[cmName]);
+                    }
+                }
+            }
+            return columnsState;
+        },
+        updateIdsOfSelectedRows = function (id, isSelected) {
+            var index = idsOfSelectedRows.indexOf(id);
+            if (!isSelected && index >= 0) {
+                idsOfSelectedRows.splice(index, 1); // remove id from the list
+            } else if (index < 0) {
+                idsOfSelectedRows.push(id);
+            }
+        },
+        firstLoad = true;
+    
+        //var cm = $grid.jqGrid('getGridParam', 'colModel');if(cm == null)cm=[];
+        myColumnsState = restoreColumnState(cm);
+        isColState = typeof (myColumnsState) !== 'undefined' && myColumnsState !== null;
+        idsOfSelectedRows = isColState && typeof (myColumnsState.selectedRows) !== "undefined" ? myColumnsState.selectedRows : [];        
+</script>
+
+<script type="text/javascript" defer="defer">
+
+    $(document).ready(function ()
+    {
+        initJQGrid();
+        extendGridFeatures();
+        initColumnChooser();
+        initExtra();
+    });
+
+    function initJQGrid() {
+        var gridHeight = ($(window).height() - 240);
+        //var tblJQGrid = jQuery('#' + gridTBLid);
+        var lastsel;
+
+      /*@* ------ START :  jqGrid init SO : 8545953 ------ *@
+        @* Grid state Demo : http://www.ok-soft-gmbh.com/jqGrid/ColumnChooserAndLocalStorage1.htm *@*/
+        tblJQGrid.jqGrid({
+            url: ListURL,
+            datatype: 'json',
+            height: gridHeight,
+            width: ($('#' + gridTBLid).parent().width()), // to have horizontal scroll bar for frozen columns.
+            colNames: ['ID', 'PO #', 'PO Date', 'Status', 'Brand', 'Vendor', 'Ship To', 'ETA', 'ETD'],
+            colModel: cm,
+            gridview: true, // CAUTION: NOT for Treeview, Subgrid or afterInsertRow -  IMP : to improve grid performance by rendering whole row at once
+            //pager: '#' + GridId + 'Pager',
+            //sortname: "PONumber", //default sorted column @* Also view SO : 8292341 for hrz scroll *@
+            autoWidth: false, // for horizontal scrollbar SO : 16876182
+            shrinkToFit: true, //DON'T use while freezing columns
+            forceFit: true, // not too effective if we've hrz scroll
+
+            viewrecords: true,//data.viewrecords,
+            ignoreCase: true, // make local search \ sort case-insensitive
+            navigator: true,   // for keys navigation in grid
+            loadonce: true,   // single call to server for grid
+            caption: "POT Dashboard jqGrid demo",
+            pager: pagerTBLid,
+            //paging: false,
+            editable: true,
+            //pgtext: "",
+            //pginput: false,
+            //hidegrid: false,
+            //pgbuttons: false,
+            //toppager: true,
+            rowList: [10, 20, 30, 50, 100, 'All'],
+            rowNum: 100, // give -1 if need to show all the rows
+            rownumbers: true,
+            //editurl: GridEditUrl,
+            viewrecords: true,
+            @* // http://www.trirand.com/jqgridwiki/doku.php?id=wiki:grouping Sends request to - http://localhost:1573/Dashboard/POListjqg?_search=false&nd=1449916232809&rows=100&page=1&sidx=Brand+asc%2C+PONumber&sord=asc *@
+
+            @* ========== START : Persist jQG =========== *@
+
+            page: isColState ? myColumnsState.page : 1,
+            search: isColState ? myColumnsState.search : false,
+            postData: isColState ? { filters: myColumnsState.filters } : {},
+            sortname: isColState ? myColumnsState.sortname : 'PONumber',
+            sortorder: isColState ? myColumnsState.sortorder : 'desc',
+            onSelectRow: function (id, isSelected) {
+                updateIdsOfSelectedRows(id, isSelected);
+                saveColumnState.call($grid, $grid[0].p.remapColumns);
+            },
+            onSelectAll: function (aRowids, isSelected) {
+                var i, count, id;
+                for (i = 0, count = aRowids.length; i < count; i++) {
+                    id = aRowids[i];
+                    updateIdsOfSelectedRows(id, isSelected);
+                }
+                saveColumnState.call($grid, $grid[0].p.remapColumns);
+            },
+            loadComplete: function (data) {
+
+                /* EXTRA SO : 1237096 */
+                $(".ui-pg-selbox option[value='All']").val(data.length);
+
+                var $this = $(this), i, count;
+
+                if (firstLoad) {
+                    firstLoad = false;
+                    if (isColState) {
+                        $this.jqGrid("remapColumns", myColumnsState.permutation, true);
+                    }
+                    if (typeof (this.ftoolbar) !== "boolean" || !this.ftoolbar) {
+                        // create toolbar if needed
+                        $this.jqGrid('filterToolbar',
+                            {stringResult: true, searchOnEnter: true, defaultSearch: myDefaultSearch});
+                    }
+                }
+                
+                refreshSerchingToolbar($this, myDefaultSearch);  $this.jqGrid("filterToolbar"); // try to trigger <enter> on gs_Brand
+                for (i = 0, count = idsOfSelectedRows.length; i < count; i++) {
+                    $this.jqGrid('setSelection', idsOfSelectedRows[i], false);
+                }
+                saveColumnState.call($this, this.p.remapColumns);
+            },
+            resizeStop: function () {
+                saveColumnState.call($grid, $grid[0].p.remapColumns);
+            },
+
+            @* ========== END : Persist jQG =========== *@
+
+            @*loadComplete: function (data) { /* SO : 1237096 */
+                $(".ui-pg-selbox option[value='All']").val(data.length);
+            },*@
+
+            @* Uncomment to enable grid grouping
+            grouping: true,
+            groupingView: {
+                groupField: ['Brand'],
+                groupDataSorted: true,
+                groupSummary: [true],
+                groupColumnShow: [false],
+               // groupText: ['({1})'],
+                showSummaryOnHide: true,
+                groupCollapse: true
+            },
+
+            caption: "Brand Grouping"
+            *@
+
+            subGrid: true,
+            caption: "Comments",
+            @* only for xml data -
+            subGridUrl: 'Commentsjqg',
+            subGridModel: [{
+                name: ['CommentBy', 'Comment1', 'PostedOn'],
+                width: [100, 200, 100],
+                params : ['ID']
+            }
+            ],*@
+            subGridRowExpanded: function (subgridDivId, rowId) { /* SO : 26409119*/
+                var rowData = tblJQGrid.getRowData(rowId);
+                var selPONo = rowData['ID'];
+                var $subgrid = $("<table id='" + subgridDivId + "_t'></table>");
+                /*  pureRowId = $.jgrid.stripPref(mainGridPrefix, rowId),
+                    subgrids = $(this).jqGrid("getGridParam", "userData"); */
+
+                $subgrid.appendTo("#" + $.jgrid.jqID(subgridDivId));
+                $subgrid.jqGrid({
+                    datatype: "json",
+                    mtype: 'GET',
+                    url: 'Commentsjqg?POID=' + selPONo,
+                    colNames: ['Comment By', 'Comment', 'Posted On'],
+                    colModel: [
+                        { name: 'CommentBy', width: 150 }, { name: "Comment1", width: 450 },
+                        {
+                            name: "PostedOn", width: 80, sorttype: 'date',
+                            formatter: 'date', formatoptions: { newformat: 'm/d/Y' }
+                        }
+                    ],
+                    @*jsonReader: {
+                        //root: "records",
+                        repeatitems: true
+                    },*@
+                    height: "100%",
+                    rowNum: 10,
+                    @*autowidth: true,*@
+                    gridview: true,
+                    idPrefix: rowId + "_"
+                });
+            }
+
+            @*onSelectRow: function (id) {
+                if (id && id !== lastsel)
+                {
+                    tblJQGrid.jqGrid('restoreRow', lastsel);
+                    tblJQGrid.jqGrid('editRow', id, true); lastsel = id;
+                }
+            }*@
+        });
+
+        @* ------ END :  jqGrid init ------ *@
+    }
+
+    function extendGridFeatures() {
+
+        @* ------ START : navGrid ------ *@
+        tblJQGrid.jqGrid('navGrid', pagerTBLid,
+            { edit: true, add: true, del: true }, @* options *@
+            { height: 280, reloadAfterSubmit: false }, @* edit options *@
+            { height: 280, reloadAfterSubmit: false }, @* add options *@
+            { reloadAfterSubmit: false }, @* del options *@
+            {
+                closeOnEscape: true, multipleSearch: true, @* http://www.trirand.com/jqgridwiki/doku.php?id=wiki:advanced_searching *@
+                closeAfterSearch: true
+            } @* search options *@
+            );
+        @* ------ END : navGrid ------ *@
+
+        tblJQGrid.jqGrid('inlineNav', pagerTBLid);
+
+        @* -- START :  Bind the navigation and set the onEnter event -- *@
+        tblJQGrid.jqGrid('bindKeys', {
+            "onEnter": function (id) {
+                if (id && id !== lastsel) {
+                    tblJQGrid.jqGrid('restoreRow', lastsel);
+                    tblJQGrid.jqGrid('editRow', id, true); lastsel = id;
+                }
+            }
+        });
+        @* ------ END : bindkeys------ *@
+
+        @* SO : 8106655 (vertical scroll issue)
+        tblJQGrid.bind('keydown', function (e) {
+            if (e.keyCode == 38 || e.keyCode == 40) e.preventDefault();
+        }); *@
+
+        tblJQGrid.hideCol('subgrid'); // hide so that headercheckbox can work as expected
+    }
+
+    function initColumnChooser()
+    {
+        /*@* SO : 10263025
+         Make sure that the group headers are not set while reordering columns *@ */
+
+        /*@* // SO : 18163713
+        // http://www.ok-soft-gmbh.com/jqGrid/SimpleLocalGridWithColumnChooser5__.htm *@ */
+        tblJQGrid.jqGrid('navGrid', pagerTBLid, { refreshstate: 'current', add: false, edit: false, del: false });
+        $.extend(true, $.ui.multiselect, {
+            locale: {
+                addAll: 'Make all visible',
+                removeAll: 'Hidde All',
+                itemsCount: 'Avlialble Columns'
+            }
+        });
+
+        $.extend(true, $.jgrid.col, {
+            width: 450,
+            modal: true,
+            msel_opts: { dividerLocation: 0.5 },
+            dialog_opts: {
+                minWidth: 470,
+                show: 'blind',
+                hide: 'explode'
+            }
+        });
+
+        tblJQGrid.jqGrid('navButtonAdd', pagerTBLid, {
+            caption: "",
+            buttonicon: "ui-icon-calculator",
+            title: "Choose columns",
+            onClickButton: function () {
+                $(this).jqGrid('columnChooser',
+                  {
+                        done : function (perm) {
+                                if (perm) {
+                                    // "OK" button are clicked
+                                    this.jqGrid("remapColumns", perm, true);
+                                    // the grid width is probably changed co we can get new width
+                                    // and adjust the width of other elements on the page
+                                    var gwdth = this.jqGrid("getGridParam","width");
+                                    this.jqGrid("setGridWidth",gwdth);
+                                } else {
+                                    // we can do some action in case of "Cancel" button clicked
+                                    var gwdth = this.jqGrid("getGridParam","width");
+                                    this.jqGrid("setGridWidth",gwdth);
+                                }
+                        //Update the localstorage for grid config
+                        saveColumnState.call($grid, $grid[0].p.remapColumns);
+                    }
+                  }
+                );
+                @* Remove grouped column headers *@
+                alert("Removing Grouped headers");
+                chkGridHdr.attr('checked', false).trigger("change"); @* But don't disable *@
+            }
+        });
+    }
+
+    function gotoPO(jqgID) {
+        var row = jqgID.split("=");
+        var row_ID = row[1];
+        var POID = tblJQGrid.getCell(row_ID, 'ID');
+        @* SO : 1368264 *@
+        window.location.href = window.location.protocol + "//" + window.location.host + "/PO/" + POID + "/Manage";
+    }
+
+    function toggleSubGrid(chk) {
+        if ($(chk).is(":checked")){
+            chkFrozenCol.attr('checked', false).trigger("change"); alert("Disabling frozen column");
+
+            tblJQGrid.showCol('subgrid');
+            chkFrozenCol.attr("disabled", true);
+        }
+        else {
+            @*// Collapse each row - SO : 16463439 *@
+            var rowIds = tblJQGrid.getDataIDs();
+            $.each(rowIds, function (index, rowId) {
+                tblJQGrid.collapseSubGridRow(rowId);
+            });
+
+            tblJQGrid.hideCol('subgrid'); @* do observe conflict with frozen *@
+            chkFrozenCol.removeAttr("disabled");
+        }
+    }
+
+    function toggleFrozenCol(chk) {
+        @* Dynamic setup : http://www.trirand.com/jqgridwiki/doku.php?id=wiki:frozencolumns *@
+
+        if ($(chk).is(":checked")) {
+            chkSubGrid.attr('checked', false).trigger("change"); alert("Disabling subgrid");
+
+            tblJQGrid.jqGrid("setGridParam", { subGrid: false }); @* observe conflict *@
+
+            tblJQGrid.jqGrid("destroyFrozenColumns")
+            .jqGrid("setColProp", "POno", { frozen: true })
+            .jqGrid("setFrozenColumns")
+            .trigger("reloadGrid", [{ current: true }]);
+
+            chkSubGrid.attr("disabled", true);
+        }
+        else {
+
+            tblJQGrid.jqGrid("setGridParam", { subGrid: true });
+
+            tblJQGrid.jqGrid('destroyFrozenColumns')
+                .trigger('reloadGrid', [{ current: true }]);
+
+            chkSubGrid.removeAttr("disabled");
+        }
+    }
+
+    function toggleGridHeaders(chk) {
+        @*// SO : 10263025
+         Make sure that the group headers are not set while reordering columns*@
+
+        if ($(chk).is(":checked")) {
+
+            @* ------ START : Group Headers ------ *@
+            tblJQGrid.jqGrid('setGroupHeaders', { @* http://www.trirand.com/jqgridwiki/doku.php?id=wiki:groupingheadar *@
+                useColSpanStyle: true, @* to show non-grouped header *@
+                groupHeaders: [
+                  { startColumnName: 'POno', numberOfColumns: 4, titleText: '<b>PO Info</b>' },
+                  { startColumnName: 'Ship', numberOfColumns: 3, titleText: '<b>Shipping Details</b>' }
+                ]
+            });
+            @* ------ END : Group Headers------ *@
+
+        }
+        else {
+            tblJQGrid.jqGrid('destroyGroupHeader');
+        }
+    }
+
+    function resetPaging(reset) { @* SO : 4757198 *@
+
+        var selPGVal = reset ?
+            $("select.ui-pg-selbox option:contains('All')").val() : '100';
+
+        var ddl = $("select.ui-pg-selbox");
+
+        if (selPGVal != ddl.val()) {
+            ddl.val(selPGVal);
+            ddl.trigger("change");
+        }
+
+        @*//Or use $("select.ui-pg-selbox option").first() & last();
+        /* $("select.ui-pg-selbox option").each(function () {
+            if (reset && $(this).text() == "All") {
+                //opt = $(this);
+                $(this).attr('selected', true);
+            }
+            else
+                $(this).removeAttr('selected'); // remove for all
+
+        });*/ *@
+    }
+
+    function groupJQGBy(ddl) {
+
+        var groupingName = $(ddl).val();
+        showNOTY("Resetting paging", true);
+        if (groupingName != null && groupingName != "") {
+            //pagerTBL.hide();
+            // SO : 1237096
+            // HT : Doesn't work as expected
+            //tblJQGrid.jqGrid('setGridParam', 'rowNum', ''); // CAUTION : 100000 is not the max possible value
+
+            //tblJQGrid.jqGrid('groupingGroupBy', groupingName);
+            tblJQGrid.jqGrid('groupingGroupBy', groupingName, {
+                //    groupField : [groupingName],
+                groupOrder: ['asc'],
+                groupColumnShow: [true],
+                groupCollapse: true
+            });
+
+            // SO : 17322817
+            // HT : Doesn't work as expected
+            //tblJQGrid.setGridParam({ page: 1, datatype: "json" }).trigger('reloadGrid');
+
+            resetPaging(true);
+        }
+        else {
+            //pagerTBL.show();
+            @*
+            tblJQGrid.jqGrid('setGridParam', 'rowNum', 100);
+            // SO : 17322817
+            // HT : Doesn't work as expected
+            tblJQGrid.setGridParam({ page: 1, datatype: "json" }).trigger('reloadGrid');*@
+            tblJQGrid.jqGrid('groupingRemove');
+            resetPaging(false);
+        }
+    }
+</script>
+
+<script type="text/javascript" defer="defer">
+    
+    function ExportGridConfig()
+    {
+        saveColumnState.call($grid, $grid[0].p.remapColumns);
+
+        $("#txtGridConf").val(tblJQGrid.jqGrid('jqGridExport', {'exptype':'xmlstring'})); // jsonstring
+        return true;
+    }
+
+    function initExtra()
+    {
+        @* Post config to persist grid state 
+        /*$grid.jqGrid('navGrid', '#pager', {edit: false, add: false, del: false});*/ *@
+        $grid.jqGrid('navButtonAdd', pagerTBLid, {
+            caption: "",
+            buttonicon: "ui-icon-closethick",
+            title: "clear saved grid's settings",
+            onClickButton: function () {
+                removeObjectFromLocalStorage(myColumnStateName);
+                window.location.reload();
+            }
+        });
+    }
+</script>
+
+<img src="@Url.Content("~/Content/Images/spacer.gif")" height="1px" width="800px" />
+
+@* For debug :
+window.localStorage.getItem('ColumnChooserAndLocalStorage2.colState')
+saveColumnState.call($grid, $grid[0].p.remapColumns);
+*@

@@ -1,0 +1,596 @@
+﻿@model POT.DAL.POHeader
+@using System.Collections
+@using HSG.Helper
+@{ ViewBag.Title = "PO"; Layout = Defaults.masterLayout;
+   bool IsAsiaVendor = _Session.IsAsiaVendor;
+   bool printPOAfterSave = (bool)ViewData["printPOAfterSave"];
+   string poPrintopenWindow = "openWinScrollable('" + Url.Action("Print", "PO", new { POID = Model.ID }) + "',648,838);";
+   string poPrintKOopenWindow = "openWinScrollable('" + Url.Action("PrintPO", "PO", new { POID = Model.ID, PONumber = Model.PONumber }) + "',648,838);";
+    //bool? oprSuccess = ((bool?)ViewData["oprSuccess"]); - Handled in master page !
+}
+@section HeadContent {
+    <script type="text/javascript">
+        var skipCommitChk = false;
+        @* *********** Make sure common.js is included*********** *@
+        $().ready(function() { 
+            @if (printPOAfterSave)
+            {@Html.Raw(poPrintopenWindow)}            
+            try{DisableSubmitButtons(false);/*$.unblockUI();*/}catch(e){}
+            
+        @************ Render tabs *********** SO: 5246558/jquery-tabs-caching-to-be-disabled-temporary-for-switching-tab-and-refreshing-oth*@
+            $("#tabs").tabs({
+         @* cache: true, spinner: 'Loading...', ajaxOptions: { cache: false}, http://jqueryui.com/upgrade-guide/1.9/#deprecated-ajaxoptions-and-cache-options-added-beforeload-event *@
+            beforeLoad: function( event, ui ) {
+                ui.ajaxSettings.cache = false;
+                if ( ui.tab.data( "loaded" ) ) {  event.preventDefault();  return;  } 
+                ui.jqXHR.done(function() {   ui.tab.data( "loaded", true ); });
+            },
+            activate: function(event, ui) { setFocus1(event, ui) },
+            active: @ViewBag.activeTab.ToString() 
+        }); @*//HT: cache: true - to prevent reload on each tab select!*@
+        
+            @*$("#tabs").tabs({ active: 2 });*@
+        @*//bind event to check po commit*@
+            window.onbeforeunload = chkCommit;
+        
+            LoadKOAndOther();
+        @*// Add client side validation*@
+            var validator = $("#frmPO").validate({ignore: [], focusCleanup: false, @Defaults.validatorJQsetting});
+        @*// Set blockUI for all forms (SO: 10753584)*@
+            $('form').submit(function () {            
+                if($(this).valid())
+                { try{DisableSubmitButtons(true);@*$.blockUI();*@}catch(e){}}
+        });        
+        
+        });
+
+     function gotoPO(POId)
+     {
+         var activeTab = $( "#tabs" ).tabs( "option", "active" );
+         if(POId > 0)
+             window.location.href = 
+             "@Url.Action("Manage", "PO", new { POId = -99 })".replace('-99',POId) + '?activeTab=' + activeTab;
+    }
+
+    var commentsEmailURL = '@Url.Action("CommentsKOEmail", "PO", new { POGUID = Model.POGUID })';
+        @*var CommentDeleteURL = '@Html.Raw(Url.Action("CommentKODelete", "PO", new { POGUID = Model.POGUID }))';*@
+
+        var FileGetURL = '@Url.Action("GetFile", "PO")?';
+        var FileDeleteURL = '@Url.Action("FileKODelete", "PO", new { POGUID = Model.POGUID })';        
+    </script>
+    <link href="@Url.Content("~/Content/BI_Fileupload/css/jquery.fileupload.css")" rel="stylesheet" type="text/css" />
+    <style>
+        table.wideTX tr td input[type=text]
+        {
+            width: 250px;
+        }
+
+        table.wideTX tr td select
+        {
+            width: 254px;
+        }
+
+        table.wideTXR tr td input[type=text]
+        {
+            width: 100%;
+            background-color: #C0C0C0;
+            color: #333333;
+        }
+
+        .autocomp
+        {
+            width: 270px;
+        }
+
+        fieldset
+        {
+            background-color: #f5f5f5;
+        }
+    </style>
+}
+@{ bool isNewPO = (Model.ID <= Defaults.Integer);
+   string cancelorDelete = isNewPO ? "Cancel" : "Delete";
+   string PONumber = isNewPO ? "(new)" : Model.PONumber.ToString();
+
+   bool hasPOIDs = false;
+   int POpos = -1, firstPO = -1, prevPO = -1, nextPO = -1, lastPO = -1, POID = Model.ID;
+   List<int> POIDs = new List<int>();
+   try
+   {
+       POIDs = _Session.POIDs;
+       hasPOIDs = (POIDs != null) && POIDs.Count > 1;
+       if (hasPOIDs)
+       {
+           POpos = _Session.POposition(POID);
+
+           firstPO = (POID == POIDs[0]) ? -1 : POIDs[0];
+           prevPO = (POpos - 1 < 0) ? -1 : POIDs[POpos - 1];
+           nextPO = (POpos + 1 > POIDs.Count - 1) ? -1 : POIDs[POpos + 1];
+           lastPO = (POID == POIDs[POIDs.Count - 1]) ? -1 : POIDs[POIDs.Count - 1];
+       }
+   }
+   catch (Exception ex)
+   { hasPOIDs = false; }
+}
+
+<table width="99%" align="center" border="0">
+    <tr>
+        <td>
+            <table width="100%" border="0">
+                <tr>
+                    <td align="left" width="30%">
+                        @if (hasPOIDs)
+                        {
+                            <table cellpadding="1" cellspacing="0" width="99.5%">
+                                <tr>
+                                    <td align="left" nowrap="nowrap" width="49%">
+                                        @*using (Html.BeginForm("Navigate", "PO", new { POID = Model.ID }, FormMethod.Post, new { @style = "display:inline" }))*@
+                                        <table border="0">
+                                            <tr>
+                                                <td>
+                                                    <input @Html.Raw((firstPO > -1) ? "" : "disabled='disabled'") onclick="gotoPO(@firstPO);return false;"
+                                    type="button" id="btnPrevFirst" class="button" value="« First" />
+                                                </td>
+                                                <td>
+                                                    <input @Html.Raw((prevPO > -1) ? "" : "disabled='disabled'") onclick="gotoPO(@prevPO);return false;"
+                                    type="button" id="btnpagerPrev" class="button" value="Prev" />
+                                                </td>
+                                                <td>
+                                                    <input @Html.Raw((nextPO > -1) ? "" : "disabled='disabled'") onclick="gotoPO(@nextPO);return false;"
+                                    type="button" id="btnpagerNext" class="button" value="Next" />
+                                                </td>
+                                                <td>
+                                                    <input @Html.Raw((lastPO > -1) ? "" : "disabled='disabled'") onclick="gotoPO(@lastPO);return false;"
+                                    type="button" id="btnNextLast" class="button" value="Last »" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td align="right" nowrap="nowrap" width="49%">
+                                        <span id="lblTotalPages" runat="server" class="boldLabel smallFont">
+                                            @Html.Raw(string.Format("Record : {0} of {1}", POpos + 1, POIDs.Count))
+                                            &nbsp;</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        }
+                    </td>
+                    <td align="center" width="40%">
+                        <table width="1%" class="highlight thinBorder" border="0">
+                            <tr>
+                                <td align="right" nowrap="nowrap">
+                                    <span class="SubHeading">PO#</span> :&nbsp; <span class="SubHeading">@Model.PONumber</span>
+                                    @Html.Hidden("PONumber", Model.PONumber)
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td align="right" width="30%">
+                        <table style="width: 90%;" border="0">
+                            <tr>
+                                <td nowrap="nowrap" align="right" id="tdButtons">
+                                    @* HT: CAUTION - Make sure first tab is selected to trigger validation *@
+                                    <input type="submit" value="Accept" class="button" onclick="skipCommitChk=true; document.getElementById('btnCommit').click();return false;" />&nbsp;
+                                    @if (!isNewPO && _Session.RoleRights.DeletePO)
+                                    {
+                                        using (Html.BeginForm("Delete", "PO", new { POID = Model.ID, POGUID = Model.POGUID, PONumber = Model.PONumber }, FormMethod.Post, new { @style = "display:inline" }))
+                                        {@*Html.Hidden("PONumber", Model.PONumber)*@
+                                        <input type="submit" value="Delete" title="Delete this po" class="button" onclick="if(confirmDeleteM
+        (event, 'Are you sure you want to delete this po and all the data related with this po?'))skipCommitChk=true; else return false;" />@Html.Raw("&nbsp;")}
+                                    }
+@*<input type="reset" value="Cancel" class="button" onclick="try{window.location.href='@Url.Action("Cancel", new { POID = Model.ID, POGUID = Model.POGUID })'}catch(ex){;}"/>*@
+                                    <input type="reset" value="Cancel" class="button" onclick="try{window.location.href='@Url.Action("List", "Dashboard")        ';}catch(ex){;}"/>&nbsp;
+                                    @if (!isNewPO)
+                                    { //&& !IsAsiaVendor
+                                        <input type="button" value="Print" class="button" onclick="return checkAndPrint(this, event);" />@Html.Raw("&nbsp;")}
+@*if (_Session.IsAdmin && !isNewPO)
+                                    {
+                                        <a href='@Url.Action("PrintPDF")' target="_blank">PDF</a>@Html.Raw("&nbsp;")@Html.Raw("&nbsp;")
+                                    }*@
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div id="tabs">
+            @Html.Raw(string.Format(Defaults.tableNavImg," class='ontopRTin' style='top:9px;right:5px;' "))            
+                <ul>
+                    <li><a href="#tabs-1"><span>1.Header</span></a></li>
+                    <li><a href="#tabs-2" href1='@Url.Action("Lines", new { POGUID = Model.POGUID })'>
+                        <span>2.Lines</span></a></li>
+                    <li><a href="#tabs-3" href1='@Url.Action("Info", new { POGUID = Model.POGUID })'>
+                        <span class="blue">3.PO Info</span></a></li>
+                    <li><a href="#tabs-4" href1='@Url.Action("Comments", new { POGUID = Model.POGUID })'>
+                        <span class="blue">4.Comments</span></a></li>
+                    <li><a href="#tabs-5" href1='@Url.Action("Files", new { POGUID = Model.POGUID })'>
+                        <span class="blue">5.Files</span></a></li>
+                </ul>
+                <div id="tabs-1" name="tabs-1">
+                    <div id="divHdr" data-bind="with: header">
+                        <table align="center" border="0" cellpadding="1" cellspacing="2" width="100%" class="wideTXR" id="tblHdr">
+                            <tr align="center" style="display: none">
+                                <td>
+                                    <span class="error">Error (if any)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left" colspan="3" valign="top">
+                                    <fieldset class="fieldSet">
+                                        <legend class="SubHeading">Order Detail</legend>
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td width="48%">
+                                                    <table width="100%">
+                                                        <tr>
+                                                            <td align="right" nowrap="nowrap" width="5%">Order Date :&nbsp;
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="PODate" name="PODate" data-bind="date:PODate" readonly="readonly" />
+                                                                @*Html.TextBox("PODate", Model.PODate.Value.ToString(Defaults.dtFormat),
+                                                            new { @readonly = "readonly" })*@
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="right" nowrap="nowrap">Terms :&nbsp;
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="Term" name="Term" data-bind="value:Term" readonly="readonly" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="right" nowrap="nowrap">Ship Via :&nbsp;
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" id="ShipVia" name="ShipVia" data-bind="value:ShipVia" readonly="readonly" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td width="4%">&nbsp;&nbsp;&nbsp;
+                                                </td>
+                                                <td width="48%">
+                                                    <table width="99%">
+                                                        <tr>
+                                                            <td align="right" nowrap="nowrap" width="5%">FOB :&nbsp;
+                                                            </td>
+                                                            <td align="left" nowrap="nowrap">
+                                                                <input type="text" id="FOB" name="FOB" data-bind="value:FOB" readonly="readonly" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="right" nowrap="nowrap">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attn :&nbsp;
+                                                            </td>
+                                                            <td align="left" nowrap="nowrap">
+                                                                <input type="text" id="ConfirmTo" name="ConfirmTo" data-bind="value:ConfirmTo" readonly="readonly" title="press <tab> key to move focus to next section" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>&nbsp;
+                                                            </td>
+                                                            <td>&nbsp;
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left" valign="top" width="49%">
+                                    <fieldset class="fieldSet">
+                                        <legend class="SubHeading">Vendor Address</legend>
+                                        <table width="99%">
+                                            <tr>
+                                                <td align="right" nowrap="nowrap" width="5%">Code :&nbsp;
+                                                </td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="VendorNumber" name="VendorNumber" data-bind="value:VendorNumber" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">Name :&nbsp;
+                                                </td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="VendorName" name="VendorName" data-bind="value:VendorName" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">Address :&nbsp;
+                                                </td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="VendorAddress1" name="VendorAddress1" data-bind="value:VendorAddress1" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="VendorAddress2" name="VendorAddress2" data-bind="value:VendorAddress2" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="VendorAddress3" name="VendorAddress3" data-bind="value:VendorAddress3" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" nowrap="nowrap">&nbsp;&nbsp;ZIP Code :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="VendorZipCode" name="VendorZipCode" data-bind="value:VendorZipCode" readonly="readonly" />
+                                                    &nbsp;
+                                                </td>
+                                                <td align="right" nowrap="nowrap">City :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="VendorCity" name="VendorCity" data-bind="value:VendorCity" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">State :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="VendorState" name="VendorState" data-bind="value:VendorState" readonly="readonly" />
+                                                </td>
+                                                <td align="right" nowrap="nowrap">Country :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="VendorCountryCode" name="VendorCountryCode" data-bind="value:VendorCountryCode" readonly="readonly" title="press <tab> key to move focus to next section" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">Fax :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="FaxNumber" name="FaxNumber" data-bind="value:FaxNumber" readonly="readonly" />
+                                                </td>
+                                                <td align="right" nowrap="nowrap"></td>
+                                                <td align="left" nowrap="nowrap"></td>
+                                            </tr>
+                                            <tr>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                                <td width="2%">&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td align="left" valign="top" width="49%">
+                                    <fieldset class="fieldSet">
+                                        <legend class="SubHeading">Ship To Address</legend>
+                                        <table width="99%">
+                                            <tr>
+                                                <td align="right" nowrap="nowrap" width="5%">Code :&nbsp;
+                                                </td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="ShipToCode" name="ShipToCode" data-bind="value:(ShipToCode() != 0)?ShipToCode():''" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">Name :&nbsp;
+                                                </td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="ShipToName" name="ShipToName" data-bind="value:ShipToName" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">Address :&nbsp;
+                                                </td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="ShipToAddress1" name="ShipToAddress1" data-bind="value:ShipToAddress1" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="ShipToAddress2" name="ShipToAddress2" data-bind="value:ShipToAddress2" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td align="left" colspan="3" nowrap="nowrap">
+                                                    <input type="text" id="ShipToAddress3" name="ShipToAddress3" data-bind="value:ShipToAddress3" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">&nbsp;&nbsp;&nbsp;&nbsp;ZIP Code :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="ShipToZipCode" name="ShipToZipCode" data-bind="value:ShipToZipCode" readonly="readonly" />
+                                                </td>
+                                                <td align="right" nowrap="nowrap">City :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="ShipToCity" name="ShipToCity" data-bind="value:ShipToCity" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right" nowrap="nowrap">State :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="ShipToState" name="ShipToState" data-bind="value:ShipToState" readonly="readonly" />
+                                                </td>
+                                                <td align="right" nowrap="nowrap">Country :&nbsp;
+                                                </td>
+                                                <td align="left" nowrap="nowrap">
+                                                    <input type="text" id="ShipToCountryCode" name="ShipToCountryCode" data-bind="value:ShipToCountryCode" readonly="readonly" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td height="23"></td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 5px"></td>
+                            </tr>
+                            <tr runat="server" id="trLastModified">
+                                <td align="left" colspan="3" valign="top" width="48%">
+                                    <fieldset class="fieldSet">
+                                        <table border="0">
+                                            <tr>
+                                                <td align="left" nowrap="nowrap">
+                                                    <i>Last Modified By</i> :&nbsp;
+                                                    <i><span data-bind="text:LastModifiedBy()"></span>
+                                                        (<span data-bind="date: LastModifiedDate()"></span>)
+                                                    </i>
+                                                </td>
+                                                @*<td width="171">
+                                            </td>
+                                            <td align="right" nowrap="nowrap">
+                                                
+                                            </td>*@
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                        </table>
+                        &nbsp;<br />
+                        &nbsp;
+                    </div>
+                </div>
+                <div id="tabs-2">
+                    @{Html.RenderPartial("Lines");}
+                </div>
+                <div id="tabs-3">
+                </div>
+                <div id="tabs-4">
+                    @{Html.RenderPartial("Comments");}
+                </div>
+                <div id="tabs-5">
+                    @* SO: 607985 - pass multiple viewdata*@
+                    @{Html.RenderPartial("Files", new ViewDataDictionary { { "Archived", Model.Archived }, { "POGUID", Model.POGUID } }); }
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+<div id="taco_niteDIV1" name="taco_niteDIV1" style1="display:none">
+    &nbsp;
+</div>
+<script src="@Url.Content("~/Content/BI_Fileupload/jquery.iframe-transport.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/BI_Fileupload/jquery.fileupload.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/Scripts/KOVM/CommentsFilesKOscript.js")" type="text/javascript"></script>
+<script type="text/javascript"> 
+    var headerViewModel = function () {
+        var self = this;
+        self.header = ko.observable();
+    }
+    var viewModelheader = new headerViewModel();
+    function createHeaderKO(hdr)
+    {
+        viewModelheader.header = ko.mapping.fromJS(hdr);
+        if (hdr != null) ko.applyBindings(viewModelheader, document.getElementById("divHdr"));
+    }
+
+    function LoadKOAndOther() {
+        $.getJSON('@Html.Raw(Url.Action("POEditKOViewModel", "PO", new { POGUID = Model.POGUID }))',
+          function (jsonData) { doTabLoadWithKOCallback(jsonData); });
+    }
+    var LinesOrderExtTotal, OrderTotal;
+    function doTabLoadWithKOCallback(POVM) {
+            
+        LinesOrderExtTotal = POVM.LinesOrderExtTotal;//TotalAmtInvoiced;
+        OrderTotal = POVM.OrderTotal;
+
+        //POGUID = POVM.Header.POGUID;
+
+           @if (!printPOAfterSave)
+           {<text>setFocus("PODate");</text>} @* Set focus will hide the print window - if invoked *@
+           
+         createHeaderKO(POVM.Header); // KO for headerViewModel tab
+
+            @*Pre-Load tabs*@
+         createLinesKO(POVM.Lines, POVM.LinesOrderExtTotal, POVM.OrderTotal); @* loaded as Html.RenderPartial("Lines")*@
+            @*reloadWithCallback('@Url.Action("Lines", new { POGUID = Model.POGUID })','',"#tabs-2", 
+                function(){ createLinesKO(POVM.Lines, POVM.LinesOrderExtTotal) } );*@
+
+         reloadWithCallback('@Url.Action("Info", new { POGUID = Model.POGUID })','',"#tabs-3", 
+             function(){createPOInfoKO(POVM);});  
+                
+         createCommentsKO(POVM.Comments, POVM.Comments.AssignTo);
+            @*reloadWithCallback('@Html.Raw(Url.Action("Comments", new { POGUID = Model.POGUID, AssignTo = Model.AssignTo }))',
+            '',"#tabs-4", function(){createCommentsKO(POVM.Comments, POVM.Comments.AssignTo);});*@
+
+        createFilesHeaderKO(POVM.Files); doUploadifyForMultiFile();
+            @*reloadWithCallback('@Url.Action("Files", new { POGUID = Model.POGUID })','',"#tabs-5", 
+                function(){createFilesHeaderKO(POVM.Files);});*@
+     }       
+    function setFocus1(evt, ui) {
+        // Objects available in the function context:
+        // ui.tab     // anchor element of the selected (clicked) tab
+        // ui.newPanel   // element, that contains the selected/clicked tab contents
+        // ui.newPanel.index()   // non-zero-based index of the selected (clicked) tab
+        var hdrTableNavDone = false, infoTableNavDone = false, cmtsTableNavDone = false, filsTableNavDone = false;
+        var extra = 1; // Due to "ontopRT" onblur title div
+        switch (ui.newPanel.index()) {
+            case 2: //Header   
+                if(!hdrTableNavDone) { $("#tblHdr").tableNav(); hdrTableNavDone = true; }
+                setFocus("PODate"); 
+                break;
+                @*case 3:break; //Lines*@
+            case 4: //Info                
+                if(!infoTableNavDone) { $("#tblnfo").tableNav(); infoTableNavDone = true; }
+                setFocus("Info_BLNumber"); 
+                break; // PoPlacedDate
+            case 5: //Comments                
+                if(!cmtsTableNavDone) { $("#tblComments").tableNav(); cmtsTableNavDone = true; }
+                setFocus("Comment1");
+                break;
+            case 6: // Files                
+                if(!filsTableNavDone) { $("#tblFilesH").tableNav(); filsTableNavDone = true;}
+                setFocus("FileType"); 
+                break;  //FileNameNEW
+        }
+    }
+    // Check and prompt if the user is getting away from the page without
+    function chkCommit(e) {
+        if (skipCommitChk) { return; }//Special case (skipCommitChk = false; done in unload)
+            
+        if (!e) e = window.event;
+        //e.cancelBubble is supported by IE - this will kill the bubbling process.
+        e.cancelBubble = true;
+        e.returnValue = 'Make sure you have saved the PO or all the changes will be lost. Do you want to leave now?'; 
+        //Above is displayed on the dialog
+
+        //e.stopPropagation works in Firefox.
+        if (e.stopPropagation) {e.stopPropagation();e.preventDefault();}
+    }
+    // A jQuery event , which is triggered after "onbeforeunload" 
+    $(window).on('beforeunload', function(){ // SO : 18783535            
+        // trigger the final cleanup 
+        if (skipCommitChk) { skipCommitChk = false; return; }
+        $.post('@Url.Action("CleanupTempUpload")', { POGUID : '@Model.POGUID'});            
+            return true;
+        });
+
+        var printPOAfterSave = false;
+        var printWindow;
+        function checkAndPrint(btn, evt){
+            if(confirmDeleteM(evt, 'Do you want to save any po changes before printing? Click cancel to continue print.')){
+                skipCommitChk=true;
+                printPOAfterSave = true;
+                $("#btnCommit").click();
+                return false;
+            }
+            else {
+                printWindow = @Html.Raw(poPrintKOopenWindow)
+                //child.window.initChildFrame(ko, viewModelheader, viewModelLines);
+                @*openWinScrollable('@Url.Action("Print", "PO", new { POID = Model.Info.ID })',648,838);*@
+                }
+        }
+
+        function invokeBinding(child)
+        { //SO:13953321 (KO doesn't work for IE < 9)
+            if(printWindow != null && printWindow.closed == false)
+                printWindow.initChildFrame(viewModelheader, viewModelLines, LinesOrderExtTotal, OrderTotal);
+        }
+</script>
